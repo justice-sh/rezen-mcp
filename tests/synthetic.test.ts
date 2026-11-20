@@ -7,7 +7,9 @@ describe("generateDataset", () => {
   });
 
   it("differs across seeds", () => {
-    expect(generateDataset({ seed: 1 }).students).not.toEqual(generateDataset({ seed: 2 }).students);
+    expect(generateDataset({ seed: 1 }).students).not.toEqual(
+      generateDataset({ seed: 2 }).students,
+    );
   });
 
   it("produces scores within valid ranges", () => {

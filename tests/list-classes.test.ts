@@ -51,7 +51,9 @@ describe("list_classes (through a real MCP client)", () => {
   });
 
   it("rejects an empty school ID", async () => {
-    const result = await client.callTool({ name: "list_classes", arguments: { schoolId: "" } }).catch((e) => e);
+    const result = await client
+      .callTool({ name: "list_classes", arguments: { schoolId: "" } })
+      .catch((e) => e);
     // Invalid input surfaces either as an isError result or a thrown protocol error.
     const failed = result instanceof Error || (result as { isError?: boolean }).isError === true;
     expect(failed).toBe(true);

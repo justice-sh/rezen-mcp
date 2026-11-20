@@ -1,14 +1,14 @@
 # Feature Spec: rezen-mcp
 
-| | |
-|---|---|
-| **Status** | Draft v0.1 (Phase 0) |
-| **Last updated** | 2026-11-20 |
-| **Owner** | Justice N. |
+|                  |                      |
+| ---------------- | -------------------- |
+| **Status**       | Draft v0.1 (Phase 0) |
+| **Last updated** | 2026-11-20           |
+| **Owner**        | Justice N.           |
 
 ## 1. Problem
 
-School staff spend hours answering the same questions from report-card data: *Who is top of Primary 3? Whose scores are still missing? How did this student do in Mathematics?* An AI assistant could answer these, but only if it has a **small, reliable, well-described tool surface** and strict boundaries around whose data it can see.
+School staff spend hours answering the same questions from report-card data: _Who is top of Primary 3? Whose scores are still missing? How did this student do in Mathematics?_ An AI assistant could answer these, but only if it has a **small, reliable, well-described tool surface** and strict boundaries around whose data it can see.
 
 ## 2. Goals
 
@@ -26,12 +26,12 @@ School staff spend hours answering the same questions from report-card data: *Wh
 
 ## 4. Users and primary scenarios
 
-| User | Scenario |
-|---|---|
-| Teacher | "Which students in Primary 4 have missing scores this term?" |
-| Head teacher | "Rank Primary 3 for this term and show ties." |
-| Parent-facing assistant (future) | "Summarise Ada's report for this term." |
-| Developer | Add a new tool, run evals, compare models. |
+| User                             | Scenario                                                     |
+| -------------------------------- | ------------------------------------------------------------ |
+| Teacher                          | "Which students in Primary 4 have missing scores this term?" |
+| Head teacher                     | "Rank Primary 3 for this term and show ties."                |
+| Parent-facing assistant (future) | "Summarise Ada's report for this term."                      |
+| Developer                        | Add a new tool, run evals, compare models.                   |
 
 ## 5. Domain and grading rules (defaults)
 
@@ -39,14 +39,14 @@ School staff spend hours answering the same questions from report-card data: *Wh
 - Subject total = CA + exam (0 to 100). Student total = sum of subject totals. Average = student total / number of subjects.
 - Grade bands (defaults, configurable later):
 
-| Total | Grade |
-|---|---|
-| 70 to 100 | A |
-| 60 to 69 | B |
-| 50 to 59 | C |
-| 45 to 49 | D |
-| 40 to 44 | E |
-| 0 to 39 | F |
+| Total     | Grade |
+| --------- | ----- |
+| 70 to 100 | A     |
+| 60 to 69  | B     |
+| 50 to 59  | C     |
+| 45 to 49  | D     |
+| 40 to 44  | E     |
+| 0 to 39   | F     |
 
 - **Ranking:** by student total, descending, using standard competition ranking (ties share a position and the next position is skipped: 1, 2, 2, 4).
 - **Missing scores:** a student with any missing subject score is **not ranked** and is listed separately as unranked with the missing subjects (see Open questions).
@@ -55,55 +55,55 @@ School staff spend hours answering the same questions from report-card data: *Wh
 
 All tools are read-only (`readOnlyHint: true`). An unknown ID and a different school's ID both return the **same** "not found" error, so existence is never leaked across schools.
 
-### 6.1 `list_classes`: *Phase 0, done*
+### 6.1 `list_classes`: _Phase 0, done_
 
-| | |
-|---|---|
-| **Purpose** | Discover class IDs for a school. |
-| **Input** | `schoolId: string` (Phase 2: no input; school comes from the token) |
-| **Output** | `school: string`, `classes: { id, name, level, studentCount }[]` ordered by level |
-| **Errors** | Unknown school ID |
+|             |                                                                                   |
+| ----------- | --------------------------------------------------------------------------------- |
+| **Purpose** | Discover class IDs for a school.                                                  |
+| **Input**   | `schoolId: string` (Phase 2: no input; school comes from the token)               |
+| **Output**  | `school: string`, `classes: { id, name, level, studentCount }[]` ordered by level |
+| **Errors**  | Unknown school ID                                                                 |
 
-### 6.2 `get_class_results`: *Phase 1*
+### 6.2 `get_class_results`: _Phase 1_
 
-| | |
-|---|---|
-| **Purpose** | All scores for a class in a term. |
-| **Input** | `classId: string`, `term?: string` (default: current term) |
-| **Output** | Per student: per-subject `{ ca, exam, total, grade }`, student total, average. Missing entries are `null`, never `0`. |
-| **Errors** | Unknown class, unknown term |
+|             |                                                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Purpose** | All scores for a class in a term.                                                                                     |
+| **Input**   | `classId: string`, `term?: string` (default: current term)                                                            |
+| **Output**  | Per student: per-subject `{ ca, exam, total, grade }`, student total, average. Missing entries are `null`, never `0`. |
+| **Errors**  | Unknown class, unknown term                                                                                           |
 
-### 6.3 `get_student_report`: *Phase 1*
+### 6.3 `get_student_report`: _Phase 1_
 
-| | |
-|---|---|
-| **Purpose** | One student's report-card data. |
-| **Input** | `studentId: string`, `term?: string` |
-| **Output** | Student, class, subject rows with grades, total, average, class position (or `null` if unranked), missing subjects. Facts only: no generated comments. |
-| **Errors** | Unknown student, unknown term |
+|             |                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Purpose** | One student's report-card data.                                                                                                                        |
+| **Input**   | `studentId: string`, `term?: string`                                                                                                                   |
+| **Output**  | Student, class, subject rows with grades, total, average, class position (or `null` if unranked), missing subjects. Facts only: no generated comments. |
+| **Errors**  | Unknown student, unknown term                                                                                                                          |
 
-### 6.4 `rank_class`: *Phase 1*
+### 6.4 `rank_class`: _Phase 1_
 
-| | |
-|---|---|
-| **Purpose** | Class ranking for a term. |
-| **Input** | `classId: string`, `term?: string` |
-| **Output** | `ranked: { position, studentId, name, total }[]` and `unranked: { studentId, name, missingSubjects }[]` |
-| **Errors** | Unknown class, unknown term |
+|             |                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| **Purpose** | Class ranking for a term.                                                                               |
+| **Input**   | `classId: string`, `term?: string`                                                                      |
+| **Output**  | `ranked: { position, studentId, name, total }[]` and `unranked: { studentId, name, missingSubjects }[]` |
+| **Errors**  | Unknown class, unknown term                                                                             |
 
-### 6.5 `find_missing_scores`: *Phase 1*
+### 6.5 `find_missing_scores`: _Phase 1_
 
-| | |
-|---|---|
-| **Purpose** | Find incomplete entries before report cards are generated. |
-| **Input** | `classId: string`, `term?: string` |
-| **Output** | `missing: { studentId, name, subject, component: "ca" \| "exam" \| "both" }[]` |
-| **Errors** | Unknown class, unknown term |
+|             |                                                                                |
+| ----------- | ------------------------------------------------------------------------------ |
+| **Purpose** | Find incomplete entries before report cards are generated.                     |
+| **Input**   | `classId: string`, `term?: string`                                             |
+| **Output**  | `missing: { studentId, name, subject, component: "ca" \| "exam" \| "both" }[]` |
+| **Errors**  | Unknown class, unknown term                                                    |
 
 ## 7. Resources and prompts
 
-- **Resource** `rezen://grading-rules`: the grading rules in section 5, as text, so assistants can explain results consistently. *(Phase 1)*
-- **Prompt** `summarise_class_term`: a template that asks for a short class summary using the tools above. *(Phase 1)*
+- **Resource** `rezen://grading-rules`: the grading rules in section 5, as text, so assistants can explain results consistently. _(Phase 1)_
+- **Prompt** `summarise_class_term`: a template that asks for a short class summary using the tools above. _(Phase 1)_
 
 ## 8. Tenancy and security
 
@@ -114,7 +114,7 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 
 ## 9. Evals
 
-Evals measure how well an assistant *uses* the tools, not just whether the tools work.
+Evals measure how well an assistant _uses_ the tools, not just whether the tools work.
 
 - **Dataset:** 30 to 50 prompts in JSONL, each with expected tool calls, expected answer checks computed from the synthetic dataset, and a category.
 - **Categories:** discovery, lookup, ranking, ties, missing scores, ambiguity, cross-school refusal.
@@ -126,16 +126,16 @@ Evals measure how well an assistant *uses* the tools, not just whether the tools
 
 These are targets to validate in Phase 4, not claims.
 
-| Area | Target |
-|---|---|
-| Tool latency | p95 under 100 ms at 10 concurrent clients on a 10,000-student dataset |
-| Correctness | 100% of tool unit tests; cross-school isolation tests pass on every tool |
-| Reproducibility | Same seed gives the same dataset, evals, and expected answers |
-| Portability | Works over stdio and Streamable HTTP |
+| Area            | Target                                                                   |
+| --------------- | ------------------------------------------------------------------------ |
+| Tool latency    | p95 under 100 ms at 10 concurrent clients on a 10,000-student dataset    |
+| Correctness     | 100% of tool unit tests; cross-school isolation tests pass on every tool |
+| Reproducibility | Same seed gives the same dataset, evals, and expected answers            |
+| Portability     | Works over stdio and Streamable HTTP                                     |
 
 ## 11. Open questions
 
-1. Should students with missing scores be ranked on available subjects (flagged) instead of unranked? *Default: unranked.*
+1. Should students with missing scores be ranked on available subjects (flagged) instead of unranked? _Default: unranked._
 2. Should `term` default to the latest term in the data or require an explicit value?
 3. Should grade bands be configurable per school in v1 or later?
 4. Is a single write tool (with explicit confirmation) worth adding after Phase 4, or does it dilute the project?

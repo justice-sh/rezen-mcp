@@ -37,7 +37,7 @@ AI assistants help build this project. This document defines how, so the work st
 
 Real corrections and surprises, added as they happen. This is where honest reporting of AI mistakes lives.
 
-| Date | What happened | What changed |
-|---|---|---|
-| 2026-11-20 | The plan assumed we might use a newer major SDK line. The npm registry showed the `latest` tag is a 1.x release. | Verified before building; recorded as ADR-002. |
+| Date       | What happened                                                                                                                                                     | What changed                                                     |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 2026-11-20 | The plan assumed we might use a newer major SDK line. The npm registry showed the `latest` tag is a 1.x release.                                                  | Verified before building; recorded as ADR-002.                   |
 | 2026-11-20 | Scaffold dependencies were installed at latest versions, and the toolchain was checked by running lint, typecheck, tests and build before anything was committed. | Pinned TypeScript to 5.x for a conservative toolchain (ADR-005). |

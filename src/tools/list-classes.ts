@@ -5,7 +5,9 @@ export const listClassesInput = {
   schoolId: z
     .string()
     .min(1)
-    .describe("The school's ID, e.g. 'sch_demo_a'. Phase 2 replaces this with token-scoped access."),
+    .describe(
+      "The school's ID, e.g. 'sch_demo_a'. Phase 2 replaces this with token-scoped access.",
+    ),
 };
 
 export const listClassesOutput = {

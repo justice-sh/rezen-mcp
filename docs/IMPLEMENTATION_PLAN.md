@@ -4,14 +4,14 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 ## Status
 
-| Phase | Name | Target | Status |
-|---|---|---|---|
-| 0 | Scaffold and docs | 2026-11-20 | Done |
-| 1 | Core tools | 2026-11-27 | Not started |
-| 2 | Postgres, tenancy, auth | 2026-12-02 | Not started |
-| 3 | Eval suite | 2026-12-07 | Not started |
-| 4 | HTTP transport, deployment, benchmarks | 2026-12-10 | Not started |
-| 5 | Polish and launch | 2026-12-14 | Not started |
+| Phase | Name                                   | Target     | Status      |
+| ----- | -------------------------------------- | ---------- | ----------- |
+| 0     | Scaffold and docs                      | 2026-11-20 | Done        |
+| 1     | Core tools                             | 2026-11-27 | Not started |
+| 2     | Postgres, tenancy, auth                | 2026-12-02 | Not started |
+| 3     | Eval suite                             | 2026-12-07 | Not started |
+| 4     | HTTP transport, deployment, benchmarks | 2026-12-10 | Not started |
+| 5     | Polish and launch                      | 2026-12-14 | Not started |
 
 ## Working agreements
 
@@ -115,6 +115,6 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 ## Status log
 
-| Date | Update |
-|---|---|
+| Date       | Update                                          |
+| ---------- | ----------------------------------------------- |
 | 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs. |
