@@ -8,7 +8,7 @@ An [MCP](https://modelcontextprotocol.io) server that lets AI assistants answer 
 
 ## Why this exists
 
-Report-card and results data is a good test bed for MCP tool design: it has real edge cases (missing scores, ties in rankings, strict per-school privacy) and clear right answers, which makes it possible to *measure* how well an assistant uses the tools instead of guessing.
+Report-card and results data is a good test bed for MCP tool design: it has real edge cases (missing scores, ties in rankings, strict per-school privacy) and clear right answers, which makes it possible to _measure_ how well an assistant uses the tools instead of guessing.
 
 ## Quick start
 
@@ -16,7 +16,8 @@ Requires Node 20+ (22 recommended, see `.nvmrc`) and [pnpm](https://pnpm.io) (th
 
 ```bash
 pnpm install
-pnpm check        # lint + typecheck + tests + build
+pnpm check        # format check + lint + typecheck + tests + build
+pnpm format       # auto-format with Prettier
 pnpm dev          # run the server over stdio
 pnpm seed         # print a summary of the synthetic dataset
 ```
@@ -30,13 +31,13 @@ node dist/index.js
 
 ## Tools
 
-| Tool | Status | Purpose |
-|---|---|---|
-| `list_classes` | Done | List a school's classes with level and student count |
-| `get_class_results` | Planned (Phase 1) | Scores for a class and term |
-| `get_student_report` | Planned (Phase 1) | One student's report-card data |
-| `rank_class` | Planned (Phase 1) | Class ranking with documented tie handling |
-| `find_missing_scores` | Planned (Phase 1) | Flag incomplete score entries |
+| Tool                  | Status            | Purpose                                              |
+| --------------------- | ----------------- | ---------------------------------------------------- |
+| `list_classes`        | Done              | List a school's classes with level and student count |
+| `get_class_results`   | Planned (Phase 1) | Scores for a class and term                          |
+| `get_student_report`  | Planned (Phase 1) | One student's report-card data                       |
+| `rank_class`          | Planned (Phase 1) | Class ranking with documented tie handling           |
+| `find_missing_scores` | Planned (Phase 1) | Flag incomplete score entries                        |
 
 Full definitions live in [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md).
 
