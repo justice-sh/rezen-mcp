@@ -34,7 +34,7 @@ Short records of decisions that shape the project. New decisions get the next nu
 
 ## ADR-005: Strict TypeScript, Vitest, ESLint, Node 22
 
-- **Status:** Accepted (2026-11-20)
+- **Status:** Accepted (2026-11-20); the Node version part is superseded by ADR-008
 - **Decision:** `strict` plus `noUncheckedIndexedAccess`; Vitest for tests (including tests through a real in-memory MCP client); ESLint with typescript-eslint; Node 22 in CI and `.nvmrc`, with `engines` set to Node 20+. TypeScript is pinned to the 5.x line for a conservative toolchain.
 - **Consequences:** Early error detection and fast feedback. Revisit TypeScript major version when convenient.
 
@@ -52,3 +52,12 @@ Short records of decisions that shape the project. New decisions get the next nu
 - **Context:** The maintainer prefers pnpm. The initial scaffold used npm and was switched before the first commit.
 - **Decision:** Use pnpm, with the version pinned in the `packageManager` field of `package.json` and the lockfile (`pnpm-lock.yaml`) committed. CI installs with `--frozen-lockfile`. Dependency install scripts are blocked by default; `pnpm-workspace.yaml` explicitly denies esbuild's build script (`allowBuilds`), since the package works without it.
 - **Consequences:** Reproducible installs and an explicit record of which dependencies may run scripts. Any new dependency that needs a build script must be reviewed and approved deliberately.
+
+---
+
+## ADR-008: Node.js 26 (LTS)
+
+- **Status:** Accepted (2026-11-20)
+- **Context:** ADR-005 pinned Node 22. Node 22 is in maintenance and, as far as we know, reaches end of life in April 2027. Node 26 was scheduled to enter LTS in October 2026, has end of life in April 2029, and the full check passes on 26.13.1.
+- **Decision:** Use Node 26 in CI (`node-version: 26`) and `.nvmrc`, require Node >=26 in `engines`, and track the matching `@types/node` major. Pin an exact major rather than `lts/*`, and review the version each October when a new LTS arrives.
+- **Consequences:** A longer support window and the same runtime locally and in CI. Contributors on older Node versions must upgrade. Supersedes the Node 22 part of ADR-005.
