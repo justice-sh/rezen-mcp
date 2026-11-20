@@ -1,0 +1,15 @@
+# Normalize line endings: LF in the repository AND in working trees on every machine.
+* text=auto eol=lf
+
+# Be explicit for files that break or misbehave with CRLF.
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files: never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
