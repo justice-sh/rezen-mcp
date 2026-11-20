@@ -12,7 +12,7 @@ Report-card and results data is a good test bed for MCP tool design: it has real
 
 ## Quick start
 
-Requires Node 20+ (22 recommended, see `.nvmrc`) and [pnpm](https://pnpm.io) (the exact version is pinned in `package.json`; `corepack enable` will pick it up).
+Requires Node 26+ (see `.nvmrc`) and [pnpm](https://pnpm.io) (the exact version is pinned in `package.json`; `corepack enable` will pick it up).
 
 ```bash
 pnpm install
