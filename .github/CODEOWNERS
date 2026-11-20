@@ -1,0 +1,3 @@
+# Every change needs review from the maintainer.
+# Enforced by the "protect-main" ruleset ("Require review from Code Owners").
+* @justice-sh
