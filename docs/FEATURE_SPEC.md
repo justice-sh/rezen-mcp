@@ -102,8 +102,8 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 
 ## 7. Resources and prompts
 
-- **Resource** `rezen://grading-rules`: the grading rules in section 5, as text, so assistants can explain results consistently. _(Phase 1)_
-- **Prompt** `summarise_class_term`: a template that asks for a short class summary using the tools above. _(Phase 1)_
+- **Resource** `rezen://grading-rules`: the grading rules in section 5, as text, so assistants can explain results consistently. _(Phase 1, done)_
+- **Prompt** `summarise_class_term`: a template that asks for a short class summary using the tools above. _(Phase 1, done)_
 
 ## 8. Tenancy and security
 

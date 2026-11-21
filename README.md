@@ -41,6 +41,13 @@ node dist/index.js
 
 Full definitions live in [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md).
 
+### Resource and prompt
+
+| Name                    | Kind     | Purpose                                                                 |
+| ----------------------- | -------- | ----------------------------------------------------------------------- |
+| `rezen://grading-rules` | Resource | How totals, grades, ties and missing scores are handled                 |
+| `summarise_class_term`  | Prompt   | Asks an assistant for a tool-grounded summary of a class's term results |
+
 ## Project layout
 
 ```
@@ -48,6 +55,8 @@ src/
   data/        domain types, synthetic data generator, repository interface
   domain/      pure grading logic: totals, grades, ranking
   tools/       one file per MCP tool
+  resources/   MCP resources (grading rules)
+  prompts/     MCP prompt templates
   server.ts    builds the MCP server and registers tools
   index.ts     stdio entry point
 tests/         unit tests and tests through a real MCP client
