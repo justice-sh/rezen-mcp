@@ -37,7 +37,7 @@ School staff spend hours answering the same questions from report-card data: _Wh
 
 - Each score entry has a continuous assessment (**CA, 0 to 40**) and an **exam (0 to 60)** per student, subject and term.
 - Subject total = CA + exam (0 to 100). Student total = sum of subject totals. Average = student total / number of subjects.
-- Grade bands (defaults, configurable later):
+- Grade bands (fixed in v1; making them configurable per school is a later feature, see ADR-010):
 
 | Total     | Grade |
 | --------- | ----- |
@@ -135,7 +135,7 @@ These are targets to validate in Phase 4, not claims.
 
 ## 11. Open questions
 
-1. Should students with missing scores be ranked on available subjects (flagged) instead of unranked? _Default: unranked._
-2. Should `term` default to the latest term in the data or require an explicit value?
-3. Should grade bands be configurable per school in v1 or later?
+1. **Resolved (ADR-009):** students with any missing score are unranked, not ranked on available subjects.
+2. **Resolved (ADR-009):** results are always termly, and every response states the term used. A caller may omit `term`, which means the school's current term (the term in progress), not merely the latest term that has data.
+3. **Resolved (ADR-010):** grade bands are not configurable in v1. Configurable bands are a later feature.
 4. Is a single write tool (with explicit confirmation) worth adding after Phase 4, or does it dilute the project?

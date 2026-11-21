@@ -7,7 +7,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | Phase | Name                                   | Target     | Status      |
 | ----- | -------------------------------------- | ---------- | ----------- |
 | 0     | Scaffold and docs                      | 2026-11-20 | Done        |
-| 1     | Core tools                             | 2026-11-27 | Not started |
+| 1     | Core tools                             | 2026-11-27 | In progress |
 | 2     | Postgres, tenancy, auth                | 2026-12-02 | Not started |
 | 3     | Eval suite                             | 2026-12-07 | Not started |
 | 4     | HTTP transport, deployment, benchmarks | 2026-12-10 | Not started |
@@ -40,7 +40,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 **Goal:** the full v1 tool surface over the in-memory repository.
 
-- [ ] Grading logic module (`src/domain/grading.ts`): totals, grades, ranking with ties, missing handling, with unit tests including edge cases
+- [x] Grading logic module (`src/domain/grading.ts`): totals, grades, ranking with ties, missing handling, with unit tests including edge cases
 - [ ] `get_class_results`
 - [ ] `get_student_report`
 - [ ] `rank_class`
@@ -115,6 +115,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 ## Status log
 
-| Date       | Update                                          |
-| ---------- | ----------------------------------------------- |
-| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs. |
+| Date       | Update                                                                                               |
+| ---------- | ---------------------------------------------------------------------------------------------------- |
+| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                      |
+| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository. |
