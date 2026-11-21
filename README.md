@@ -31,13 +31,13 @@ node dist/index.js
 
 ## Tools
 
-| Tool                  | Status            | Purpose                                              |
-| --------------------- | ----------------- | ---------------------------------------------------- |
-| `list_classes`        | Done              | List a school's classes with level and student count |
-| `get_class_results`   | Planned (Phase 1) | Scores for a class and term                          |
-| `get_student_report`  | Planned (Phase 1) | One student's report-card data                       |
-| `rank_class`          | Planned (Phase 1) | Class ranking with documented tie handling           |
-| `find_missing_scores` | Planned (Phase 1) | Flag incomplete score entries                        |
+| Tool                  | Status | Purpose                                              |
+| --------------------- | ------ | ---------------------------------------------------- |
+| `list_classes`        | Done   | List a school's classes with level and student count |
+| `get_class_results`   | Done   | Scores for a class and term                          |
+| `get_student_report`  | Done   | One student's report-card data                       |
+| `rank_class`          | Done   | Class ranking with documented tie handling           |
+| `find_missing_scores` | Done   | Flag incomplete score entries                        |
 
 Full definitions live in [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md).
 

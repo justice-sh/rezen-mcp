@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { Repository } from "../data/repository.js";
+import { notFound } from "./errors.js";
 
 export const listClassesInput = {
   schoolId: z
@@ -28,17 +29,7 @@ export const LIST_CLASSES_DESCRIPTION =
 
 export async function listClasses(repo: Repository, args: { schoolId: string }) {
   const school = await repo.getSchool(args.schoolId);
-  if (!school) {
-    return {
-      isError: true as const,
-      content: [
-        {
-          type: "text" as const,
-          text: `Unknown school ID '${args.schoolId}'. Check the ID and try again.`,
-        },
-      ],
-    };
-  }
+  if (!school) return notFound("school", args.schoolId);
 
   const classes = await repo.listClasses(school.id);
   const structured = { school: school.name, classes };

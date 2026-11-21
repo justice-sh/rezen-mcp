@@ -41,13 +41,13 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 **Goal:** the full v1 tool surface over the in-memory repository.
 
 - [x] Grading logic module (`src/domain/grading.ts`): totals, grades, ranking with ties, missing handling, with unit tests including edge cases
-- [ ] `get_class_results`
-- [ ] `get_student_report`
-- [ ] `rank_class`
-- [ ] `find_missing_scores`
+- [x] `get_class_results`
+- [x] `get_student_report`
+- [x] `rank_class`
+- [x] `find_missing_scores`
 - [ ] `rezen://grading-rules` resource and `summarise_class_term` prompt
-- [ ] Consistent error shape for not-found and invalid-term
-- [ ] Each tool tested through a real MCP client
+- [x] Consistent error shape for not-found and invalid-term
+- [x] Each tool tested through a real MCP client
 
 **Exit criteria:** all five tools match the spec; ties and missing scores are covered by tests; README tool table updated.
 
@@ -115,7 +115,8 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 ## Status log
 
-| Date       | Update                                                                                               |
-| ---------- | ---------------------------------------------------------------------------------------------------- |
-| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                      |
-| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository. |
+| Date       | Update                                                                                                                        |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                               |
+| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                          |
+| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client. |

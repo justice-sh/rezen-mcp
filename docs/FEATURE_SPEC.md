@@ -64,7 +64,7 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 | **Output**  | `school: string`, `classes: { id, name, level, studentCount }[]` ordered by level |
 | **Errors**  | Unknown school ID                                                                 |
 
-### 6.2 `get_class_results`: _Phase 1_
+### 6.2 `get_class_results`: _Phase 1, done_
 
 |             |                                                                                                                       |
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
@@ -73,7 +73,7 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 | **Output**  | Per student: per-subject `{ ca, exam, total, grade }`, student total, average. Missing entries are `null`, never `0`. |
 | **Errors**  | Unknown class, unknown term                                                                                           |
 
-### 6.3 `get_student_report`: _Phase 1_
+### 6.3 `get_student_report`: _Phase 1, done_
 
 |             |                                                                                                                                                        |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -82,7 +82,7 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 | **Output**  | Student, class, subject rows with grades, total, average, class position (or `null` if unranked), missing subjects. Facts only: no generated comments. |
 | **Errors**  | Unknown student, unknown term                                                                                                                          |
 
-### 6.4 `rank_class`: _Phase 1_
+### 6.4 `rank_class`: _Phase 1, done_
 
 |             |                                                                                                         |
 | ----------- | ------------------------------------------------------------------------------------------------------- |
@@ -91,7 +91,7 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 | **Output**  | `ranked: { position, studentId, name, total }[]` and `unranked: { studentId, name, missingSubjects }[]` |
 | **Errors**  | Unknown class, unknown term                                                                             |
 
-### 6.5 `find_missing_scores`: _Phase 1_
+### 6.5 `find_missing_scores`: _Phase 1, done_
 
 |             |                                                                                |
 | ----------- | ------------------------------------------------------------------------------ |
@@ -138,4 +138,4 @@ These are targets to validate in Phase 4, not claims.
 1. **Resolved (ADR-009):** students with any missing score are unranked, not ranked on available subjects.
 2. **Resolved (ADR-009):** results are always termly, and every response states the term used. A caller may omit `term`, which means the school's current term (the term in progress), not merely the latest term that has data.
 3. **Resolved (ADR-010):** grade bands are not configurable in v1. Configurable bands are a later feature.
-4. Is a single write tool (with explicit confirmation) worth adding after Phase 4, or does it dilute the project?
+4. **Decided (ADR-011):** no write tool in v1. Finish and polish the read-only server first, then decide after Phase 4.

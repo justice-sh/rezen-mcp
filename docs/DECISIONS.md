@@ -79,3 +79,12 @@ Short records of decisions that shape the project. New decisions get the next nu
 - **Context:** Schools may want different grade bands, but configuration adds storage, validation and authorization work.
 - **Decision:** Grade bands are the fixed defaults in the feature spec (A 70 to 100 down to F 0 to 39). Per-school configurable bands are a later feature.
 - **Consequences:** Simpler tools, tests and evals now. When bands become configurable, grading functions will need the bands passed in, and that change will get its own ADR.
+
+---
+
+## ADR-011: No write tool in v1; revisit after Phase 4
+
+- **Status:** Accepted (2026-11-21)
+- **Context:** Open question 4 asked whether a single write tool with explicit confirmation (for example, recording a score) is worth adding. Write tools need authorization, an audit trail, undo, concurrency handling and harder, state-changing evals, which would dominate a small project. ADR-003 already made v1 read-only.
+- **Decision:** No write tool in v1. Finish and polish the read-only server first, then decide after Phase 4.
+- **Consequences:** A smaller attack surface and simpler evals now. If a write tool is added later, it gets its own spec section, authorization design and ADR.
