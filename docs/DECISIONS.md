@@ -61,3 +61,21 @@ Short records of decisions that shape the project. New decisions get the next nu
 - **Context:** ADR-005 pinned Node 22. Node 22 is in maintenance and, as far as we know, reaches end of life in April 2027. Node 26 was scheduled to enter LTS in October 2026, has end of life in April 2029, and the full check passes on 26.13.1.
 - **Decision:** Use Node 26 in CI (`node-version: 26`) and `.nvmrc`, require Node >=26 in `engines`, and track the matching `@types/node` major. Pin an exact major rather than `lts/*`, and review the version each October when a new LTS arrives.
 - **Consequences:** A longer support window and the same runtime locally and in CI. Contributors on older Node versions must upgrade. Supersedes the Node 22 part of ADR-005.
+
+---
+
+## ADR-009: Missing scores leave a student unranked; term defaults to the current term
+
+- **Status:** Accepted (2026-11-20)
+- **Context:** The feature spec left two questions open: how to rank students with missing scores, and how `term` should work. Student results are termly and a school never operates without a term (the target market is Nigeria), so a result without a term is meaningless.
+- **Decision:** A student with any missing score or score part has no total, average or position, and is reported as unranked with the missing subjects. Missing scores are never treated as zero. Every response states the term it used. A caller may omit `term`, which means the school's **current term** (the term in progress, from `Repository.getCurrentTerm()`), not the latest term that happens to have data. An unknown term is an error that lists the valid terms.
+- **Consequences:** Rankings never silently reward or punish incomplete data, and assistants are told exactly what is missing. Omitting the term is safe at the start of a term, when no scores have been entered yet. The current term must be defined by the data source: a dataset field now, and a terms table with dates in Phase 2. A caller who wants a partial ranking would need a new tool or option, which is out of scope for v1.
+
+---
+
+## ADR-010: Grade bands are fixed in v1
+
+- **Status:** Accepted (2026-11-20)
+- **Context:** Schools may want different grade bands, but configuration adds storage, validation and authorization work.
+- **Decision:** Grade bands are the fixed defaults in the feature spec (A 70 to 100 down to F 0 to 39). Per-school configurable bands are a later feature.
+- **Consequences:** Simpler tools, tests and evals now. When bands become configurable, grading functions will need the bands passed in, and that change will get its own ADR.

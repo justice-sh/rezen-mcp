@@ -52,14 +52,19 @@ const LAST_NAMES = [
   "Sani",
 ];
 export const SUBJECTS = ["Mathematics", "English", "Basic Science", "Social Studies"] as const;
-export const DEFAULT_TERM = "2026-T1";
+/** Chronological order. */
+export const TERMS = ["2026-T1", "2026-T2"] as const;
 
 export interface GenerateOptions {
   seed?: number;
   classesPerSchool?: number;
   studentsPerClass?: number;
-  /** Probability that a single score entry is missing (to exercise edge cases). */
+  /** Probability that a whole score entry (CA and exam) is missing. */
   missingScoreRate?: number;
+  /** Probability that just one component (CA or exam) of an entry is missing. */
+  partialScoreRate?: number;
+  /** The term in progress. Defaults to the last term in TERMS. */
+  currentTerm?: string;
 }
 
 const DEMO_SCHOOLS: School[] = [
@@ -77,6 +82,8 @@ export function generateDataset(options: GenerateOptions = {}): Dataset {
     classesPerSchool = 4,
     studentsPerClass = 12,
     missingScoreRate = 0.03,
+    partialScoreRate = 0.02,
+    currentTerm = TERMS[TERMS.length - 1] as string,
   } = options;
   const rng = createRng(seed);
 
@@ -95,19 +102,37 @@ export function generateDataset(options: GenerateOptions = {}): Dataset {
         const name = `${pick(FIRST_NAMES, rng)} ${pick(LAST_NAMES, rng)}`;
         students.push({ id: studentId, classId, name });
 
-        for (const subject of SUBJECTS) {
-          if (rng() < missingScoreRate) continue;
-          scores.push({
-            studentId,
-            subject,
-            term: DEFAULT_TERM,
-            ca: Math.floor(rng() * 41),
-            exam: Math.floor(rng() * 61),
-          });
+        for (const term of TERMS) {
+          for (const subject of SUBJECTS) {
+            // Always draw the same number of random values per entry so the
+            // dataset stays stable when the rates change.
+            const caValue = Math.floor(rng() * 41);
+            const examValue = Math.floor(rng() * 61);
+            const entryRoll = rng();
+            const caRoll = rng();
+            const examRoll = rng();
+
+            if (entryRoll < missingScoreRate) continue;
+            scores.push({
+              studentId,
+              subject,
+              term,
+              ca: caRoll < partialScoreRate ? null : caValue,
+              exam: examRoll < partialScoreRate ? null : examValue,
+            });
+          }
         }
       }
     }
   }
 
-  return { schools: DEMO_SCHOOLS.map((s) => ({ ...s })), classes, students, scores };
+  return {
+    schools: DEMO_SCHOOLS.map((s) => ({ ...s })),
+    classes,
+    students,
+    scores,
+    subjects: [...SUBJECTS],
+    terms: [...TERMS],
+    currentTerm,
+  };
 }
