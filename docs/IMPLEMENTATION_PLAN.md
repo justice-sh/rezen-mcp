@@ -7,7 +7,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | Phase | Name                                   | Target     | Status      |
 | ----- | -------------------------------------- | ---------- | ----------- |
 | 0     | Scaffold and docs                      | 2026-11-20 | Done        |
-| 1     | Core tools                             | 2026-11-27 | In progress |
+| 1     | Core tools                             | 2026-11-27 | Done        |
 | 2     | Postgres, tenancy, auth                | 2026-12-02 | Not started |
 | 3     | Eval suite                             | 2026-12-07 | Not started |
 | 4     | HTTP transport, deployment, benchmarks | 2026-12-10 | Not started |
@@ -45,7 +45,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 - [x] `get_student_report`
 - [x] `rank_class`
 - [x] `find_missing_scores`
-- [ ] `rezen://grading-rules` resource and `summarise_class_term` prompt
+- [x] `rezen://grading-rules` resource and `summarise_class_term` prompt
 - [x] Consistent error shape for not-found and invalid-term
 - [x] Each tool tested through a real MCP client
 
@@ -120,3 +120,4 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                               |
 | 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                          |
 | 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client. |
+| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                             |

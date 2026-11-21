@@ -30,6 +30,8 @@ import {
   rankClassInput,
   rankClassOutput,
 } from "./tools/rank-class.js";
+import { registerSummariseClassTerm } from "./prompts/summarise-class-term.js";
+import { registerGradingRules } from "./resources/grading-rules.js";
 import { SERVER_NAME, SERVER_VERSION } from "./version.js";
 
 /** Every tool is read-only and only touches this server's own data. */
@@ -97,6 +99,9 @@ export function createServer(repo: Repository): McpServer {
     },
     (args) => findMissingScores(repo, args),
   );
+
+  registerGradingRules(server);
+  registerSummariseClassTerm(server);
 
   return server;
 }
