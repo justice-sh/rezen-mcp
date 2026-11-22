@@ -19,6 +19,7 @@ pnpm install
 pnpm check        # format check + lint + typecheck + tests + build
 pnpm format       # auto-format with Prettier
 pnpm dev          # run the server over stdio
+pnpm inspector    # explore the server in the MCP Inspector (browser)
 pnpm seed         # print a summary of the synthetic dataset
 ```
 
@@ -28,6 +29,24 @@ To try it with an MCP client over stdio, point the client at the built server:
 pnpm build
 node dist/index.js
 ```
+
+## Explore it in the browser
+
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a browser UI for trying a server by hand: list and call tools, read resources, and run prompts.
+
+```bash
+pnpm inspector
+```
+
+This starts the server from source over stdio and prints a local URL (the page opens by itself in most setups; otherwise copy the URL from the terminal). The URL contains a one-time token, so use the one printed in your own terminal. Everything runs on your machine and the data is synthetic.
+
+Things to try:
+
+- **Tools:** call `list_classes` with `schoolId` set to `sch_demo_a`, then use a returned class ID with `get_class_results` or `rank_class`.
+- **Resources:** read `rezen://grading-rules`.
+- **Prompts:** run `summarise_class_term`.
+
+Press `Ctrl+C` in the terminal to stop it. The Inspector also has a CLI mode that is handy in scripts: `pnpm exec mcp-inspector --cli tsx src/index.ts --method tools/list`.
 
 ## Tools
 
