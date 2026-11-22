@@ -68,6 +68,8 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 **Exit criteria:** isolation tests pass for every tool; the app runs against a local or hosted Postgres with no real data; `.env.example` is complete.
 
+**Slices:** (1) Config flow: layered env files, validated schema, `cross-env` for tests. (2) Database connection layer: one `DATABASE_URL`, `DB_PROVIDER` docker or local, `docker-compose.yml`. (3) Dynamic test databases: one per test file, test-mode guard, purge script, CI Postgres. (4) Schema and migrations (Drizzle). (5) Seed and `pre-deploy` script. (6) `PostgresRepository`, contract tests, `DATA_STORE` switch. (7) Per-school tokens. (8) School-scoped repository. (9) Server derives the school from the token; `schoolId` removed from tool inputs. (10) Row-level security. (11) Isolation matrix and phase close.
+
 **Risks:** leaking existence of other schools' IDs through different error messages. Use one shared not-found error.
 
 ## Phase 3: Eval suite
@@ -122,3 +124,4 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client. |
 | 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                             |
 | 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).              |
+| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).            |

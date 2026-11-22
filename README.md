@@ -23,6 +23,10 @@ pnpm inspector    # explore the server in the MCP Inspector (browser)
 pnpm seed         # print a summary of the synthetic dataset
 ```
 
+### Configuration
+
+Configuration comes from environment variables, validated at startup. Copy `.env.example` to `.env` for local development. An optional `.env.<NODE_ENV>` (for example `.env.test`) overrides it, and real environment variables, such as those set in CI or on a hosting platform, always win. Env files are never committed. See ADR-013.
+
 To try it with an MCP client over stdio, point the client at the built server:
 
 ```bash
@@ -76,6 +80,7 @@ src/
   tools/       one file per MCP tool
   resources/   MCP resources (grading rules)
   prompts/     MCP prompt templates
+  config/      layered env loading and the validated config schema
   server.ts    builds the MCP server and registers tools
   index.ts     stdio entry point
 tests/         unit tests and tests through a real MCP client
