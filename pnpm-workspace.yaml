@@ -1,2 +1,4 @@
 allowBuilds:
   esbuild: true
+  # Its postinstall only installs client deps in a source checkout; it does nothing as a dependency.
+  "@modelcontextprotocol/inspector": false

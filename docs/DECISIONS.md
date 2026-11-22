@@ -88,3 +88,12 @@ Short records of decisions that shape the project. New decisions get the next nu
 - **Context:** Open question 4 asked whether a single write tool with explicit confirmation (for example, recording a score) is worth adding. Write tools need authorization, an audit trail, undo, concurrency handling and harder, state-changing evals, which would dominate a small project. ADR-003 already made v1 read-only.
 - **Decision:** No write tool in v1. Finish and polish the read-only server first, then decide after Phase 4.
 - **Consequences:** A smaller attack surface and simpler evals now. If a write tool is added later, it gets its own spec section, authorization design and ADR.
+
+---
+
+## ADR-012: MCP Inspector for manual inspection
+
+- **Status:** Accepted (2026-11-22)
+- **Context:** Tests exercise the server through a real MCP client, but there was no quick way for a person to try the tools, resource and prompt by hand. The official MCP Inspector gives a browser UI for that.
+- **Decision:** Add `@modelcontextprotocol/inspector` as a dev dependency, pinned to an exact version, and a `pnpm inspector` script that runs the server from source with `tsx`. The Inspector's install script is explicitly disabled in `pnpm-workspace.yaml` (`allowBuilds`): it only installs client dependencies in a source checkout and does nothing when used as a dependency, and an unreviewed build script would otherwise fail `pnpm install` in CI.
+- **Consequences:** Anyone can explore the server in a browser with one command. A new dev dependency tree to keep current. The version is pinned, so upgrades are deliberate. The Inspector is a manual tool and is not part of `pnpm check` or CI. Over stdio it runs locally and uses only synthetic data; remote HTTP inspection waits for Phase 4.

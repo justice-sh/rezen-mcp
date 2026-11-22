@@ -121,3 +121,4 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                          |
 | 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client. |
 | 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                             |
+| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).              |
