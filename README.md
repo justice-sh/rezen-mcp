@@ -27,6 +27,18 @@ pnpm seed         # print a summary of the synthetic dataset
 
 Configuration comes from environment variables, validated at startup. Copy `.env.example` to `.env` for local development. An optional `.env.<NODE_ENV>` (for example `.env.test`) overrides it, and real environment variables, such as those set in CI or on a hosting platform, always win. Env files are never committed. See ADR-013.
 
+### Database
+
+From Phase 2 the app can use Postgres through one `DATABASE_URL`. `DB_PROVIDER` says which server is behind it: `docker` (the default) or `local`, a Postgres installed on your machine, which needs no Docker. The code behaves the same either way (ADR-014).
+
+```bash
+pnpm db:up      # docker provider: start Postgres from docker-compose.yml (port 15432)
+pnpm db:check   # show which database the app uses and whether it answers
+pnpm db:down    # stop the container
+```
+
+`.env.example` has the values for both providers. The data is synthetic and the credentials are throwaway.
+
 To try it with an MCP client over stdio, point the client at the built server:
 
 ```bash
@@ -81,6 +93,7 @@ src/
   resources/   MCP resources (grading rules)
   prompts/     MCP prompt templates
   config/      layered env loading and the validated config schema
+  db/          Postgres connection layer (docker or local provider)
   server.ts    builds the MCP server and registers tools
   index.ts     stdio entry point
 tests/         unit tests and tests through a real MCP client

@@ -110,7 +110,7 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 - **Phase 0 to 1:** the school is passed as a tool argument (demo only).
 - **Phase 2:** one token per school. The server derives the school from the token. Postgres **row-level security** enforces isolation as a second layer. Tool inputs no longer include `schoolId` (a documented breaking change).
 - No personal data in logs. Inputs validated with Zod. No secrets in the repository.
-- Configuration comes from environment variables, validated at startup in one place. Files are layered (`.env`, then `.env.<NODE_ENV>`) and real environment variables always win (ADR-013).
+- Configuration comes from environment variables, validated at startup in one place. Files are layered (`.env`, then `.env.<NODE_ENV>`) and real environment variables always win (ADR-013). Postgres is reached through one `DATABASE_URL`; `DB_PROVIDER` (`docker` or `local`) selects the implementation (ADR-014).
 - A test must prove school A's token can never read school B's data, through every tool.
 
 ## 9. Evals
