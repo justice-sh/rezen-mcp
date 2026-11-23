@@ -1,0 +1,23 @@
+# Local Postgres for development: `pnpm db:up` / `pnpm db:down`.
+# Throwaway credentials, synthetic data only. Host port 15432 stays clear of a
+# Postgres installed on this machine (5432, and often 5433 or 5434 for a second
+# instance), which would otherwise answer instead of the container.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: rezen
+      POSTGRES_PASSWORD: rezen
+      POSTGRES_DB: rezen_mcp
+    ports:
+      - "15432:5432"
+    volumes:
+      - rezen_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rezen -d rezen_mcp"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  rezen_pgdata:

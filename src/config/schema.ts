@@ -6,6 +6,13 @@ import { z } from "zod";
  */
 export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+
+  // The one connection URL, whichever provider runs the server. Optional until
+  // something needs it (the in-memory repository works without a database).
+  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }).optional(),
+
+  // Which Postgres runs behind DATABASE_URL: a Docker container or one installed locally.
+  DB_PROVIDER: z.enum(["docker", "local"]).default("docker"),
 });
 
 export type Config = Readonly<z.infer<typeof envSchema>>;

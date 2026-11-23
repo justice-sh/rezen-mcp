@@ -57,7 +57,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 **Goal:** real persistence and provable school isolation.
 
-- [ ] Choose and document the data-access approach (ADR)
+- [x] Choose and document the data-access approach (ADR-013 config, ADR-014 Postgres access)
 - [ ] Schema and migrations; seed script inserts the synthetic dataset
 - [ ] `PostgresRepository` implementing `Repository`
 - [ ] Repository contract tests run against both implementations
@@ -117,11 +117,12 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 ## Status log
 
-| Date       | Update                                                                                                                        |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                               |
-| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                          |
-| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client. |
-| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                             |
-| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).              |
-| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).            |
+| Date       | Update                                                                                                                                 |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                                        |
+| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                                   |
+| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client.          |
+| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                                      |
+| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).                       |
+| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).                     |
+| 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014). |
