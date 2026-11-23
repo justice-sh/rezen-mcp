@@ -23,8 +23,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "cross-env NODE_ENV=test vitest run",
-    "test:watch": "cross-env NODE_ENV=test vitest",
+    "test": "pnpm test:db:setup && cross-env NODE_ENV=test vitest run",
+    "test:watch": "pnpm test:db:setup && cross-env NODE_ENV=test vitest",
+    "test:db:setup": "cross-env NODE_ENV=test tsx scripts/test-db-setup.ts",
+    "test:db:purge": "cross-env NODE_ENV=test tsx scripts/test-db-purge.ts",
     "seed": "tsx scripts/seed.ts",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },

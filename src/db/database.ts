@@ -54,15 +54,14 @@ function isNetworkError(error: unknown): boolean {
 
 /** `host:port/name` for a connection URL, without the user or password. */
 export function describeTarget(url: string): string {
-  let parsed: URL;
   try {
-    parsed = new URL(url);
+    const parsed = new URL(url);
+    const name = decodeURIComponent(parsed.pathname.replace(/^\//, ""));
+    return `${parsed.hostname}:${parsed.port || "5432"}/${name}`;
   } catch (error) {
     // Do not echo the value: it may contain a password.
     throw new DatabaseError("invalid-url", "DATABASE_URL is not a valid URL.", { cause: error });
   }
-  const name = decodeURIComponent(parsed.pathname.replace(/^\//, ""));
-  return `${parsed.hostname}:${parsed.port || "5432"}/${name}`;
 }
 
 export abstract class PostgresDatabase implements Database {

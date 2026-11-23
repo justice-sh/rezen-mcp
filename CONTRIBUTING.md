@@ -4,7 +4,7 @@ Thanks for taking a look. This project is intentionally small and spec-driven.
 
 1. Read [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md) and [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 2. Open an issue before large changes, so scope stays aligned with the spec.
-3. Run `pnpm check` before opening a PR (format check, lint, typecheck, tests, build). `pnpm format` fixes formatting.
+3. Run `pnpm check` before opening a PR (format check, lint, typecheck, tests, build). `pnpm format` fixes formatting. Tests need a Postgres: see "Tests and the test database" in the README.
 4. Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
 5. Never include real student or school data, secrets or real database URLs. All data here is synthetic.
 
