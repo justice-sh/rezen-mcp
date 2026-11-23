@@ -39,6 +39,20 @@ pnpm db:down    # stop the container
 
 `.env.example` has the values for both providers. The data is synthetic and the credentials are throwaway.
 
+### Tests and the test database
+
+Tests need a Postgres. Each test file gets its own throwaway database, so files run in parallel without sharing state (ADR-015). Set it up once:
+
+```bash
+pnpm db:up            # docker provider; skip it if you use a local Postgres
+# .env.test: DATABASE_URL=postgresql://rezen:rezen@localhost:15432/rezen_mcp_test
+pnpm test             # creates the base test database if it is missing, then runs the tests
+```
+
+`pnpm test` and `pnpm test:watch` run `pnpm test:db:setup` first. It is safe to run repeatedly: it only creates the base test database when it is missing. `pnpm test:db:purge` drops every test database, including the base one (`pnpm test` recreates it); run it after a crashed run, and not while tests are running.
+
+The database name must contain `test`, and `NODE_ENV` must be `test` (`pnpm test` sets it); otherwise the helpers refuse to run. CI uses a Postgres service container.
+
 To try it with an MCP client over stdio, point the client at the built server:
 
 ```bash

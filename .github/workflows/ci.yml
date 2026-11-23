@@ -11,6 +11,24 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # Throwaway Postgres for the database tests. Synthetic data only.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: rezen
+          POSTGRES_PASSWORD: rezen
+          POSTGRES_DB: rezen_mcp_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rezen -d rezen_mcp_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_PROVIDER: docker
+      DATABASE_URL: postgresql://rezen:rezen@localhost:5432/rezen_mcp_test
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
