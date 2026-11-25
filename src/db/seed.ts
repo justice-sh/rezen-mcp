@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { generateDataset } from "../data/synthetic.js";
 import type { Dataset } from "../data/types.js";
 import type { Database } from "./database.js";
-import { DatabaseError } from "./errors.js";
+import { DatabaseError, findSqlError } from "./errors.js";
 import * as schema from "./schema.js";
 
 /** How many rows one insert statement carries. Far below Postgres' limit on parameters. */
@@ -161,15 +161,4 @@ async function insertInChunks<Row>(
     inserted += (await write(rows.slice(start, start + CHUNK_SIZE))).length;
   }
   return { inserted, skipped: rows.length - inserted };
-}
-
-/** Drizzle wraps the driver's error, so the Postgres error (the one with a SQLSTATE `code`) can be a `cause`. */
-function findSqlError(error: unknown): (Error & { code: string }) | undefined {
-  for (let current = error, depth = 0; current instanceof Error && depth < 5; depth += 1) {
-    if ("code" in current && typeof current.code === "string") {
-      return current as Error & { code: string };
-    }
-    current = current.cause;
-  }
-  return undefined;
 }

@@ -79,8 +79,8 @@ Rules for slices:
 - [x] Choose and document the data-access approach (ADR-013 config, ADR-014 Postgres access)
 - [x] Schema and migrations (ADR-016)
 - [x] Seed script inserts the synthetic dataset, safe to repeat; `pre-deploy` migrates then seeds (ADR-018)
-- [ ] `PostgresRepository` implementing `Repository`
-- [ ] Repository contract tests run against both implementations
+- [x] `PostgresRepository` implementing `Repository`, chosen by `DATA_STORE` (ADR-019)
+- [x] Repository contract tests run against both implementations (ADR-019)
 - [ ] Per-school tokens; server derives school from the token
 - [ ] Row-level security policies as a second isolation layer
 - [ ] Remove `schoolId` from tool inputs (documented breaking change)
@@ -150,3 +150,4 @@ Rules for slices:
 | 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                   |
 | 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                              |
 | 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                        |
+| 2026-11-25 | Phase 2 slice 6: `PostgresRepository`, one defined order for every list, `DATA_STORE` switch, shared contract tests on both stores (ADR-019).                    |

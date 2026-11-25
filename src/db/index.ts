@@ -5,7 +5,8 @@ import { LocalDatabase } from "./local-database.js";
 
 export type { Database, DatabaseOptions, DbProvider } from "./database.js";
 export { describeTarget } from "./database.js";
-export { DatabaseError, type DatabaseErrorKind } from "./errors.js";
+export { DatabaseError, findSqlError, type DatabaseErrorKind } from "./errors.js";
+export { PostgresRepository } from "./postgres-repository.js";
 export { MIGRATIONS_FOLDER, migrateDatabase } from "./migrate.js";
 export { seedDatabase, type SeedResult, type SeedTableCounts } from "./seed.js";
 
