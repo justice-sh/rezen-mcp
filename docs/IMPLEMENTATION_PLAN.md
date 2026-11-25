@@ -8,7 +8,7 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | ----- | -------------------------------------- | ---------- | ----------- |
 | 0     | Scaffold and docs                      | 2026-11-20 | Done        |
 | 1     | Core tools                             | 2026-11-27 | Done        |
-| 2     | Postgres, tenancy, auth                | 2026-12-02 | Not started |
+| 2     | Postgres, tenancy, auth                | 2026-12-02 | In progress |
 | 3     | Eval suite                             | 2026-12-07 | Not started |
 | 4     | HTTP transport, deployment, benchmarks | 2026-12-10 | Not started |
 | 5     | Polish and launch                      | 2026-12-14 | Not started |
@@ -58,7 +58,8 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 **Goal:** real persistence and provable school isolation.
 
 - [x] Choose and document the data-access approach (ADR-013 config, ADR-014 Postgres access)
-- [ ] Schema and migrations; seed script inserts the synthetic dataset
+- [x] Schema and migrations (ADR-016)
+- [ ] Seed script inserts the synthetic dataset
 - [ ] `PostgresRepository` implementing `Repository`
 - [ ] Repository contract tests run against both implementations
 - [ ] Per-school tokens; server derives school from the token
@@ -127,3 +128,4 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).                                               |
 | 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014).                           |
 | 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015). |
+| 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                   |
