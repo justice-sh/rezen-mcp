@@ -21,6 +21,22 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 - Decisions that change direction go in `docs/DECISIONS.md`.
 - AI assistance follows `docs/AI_WORKFLOW.md`.
 
+## How work is broken down
+
+Feature first, then phases, then slices.
+
+1. **Feature.** Work starts from a feature in `docs/FEATURE_SPEC.md`, written or changed before the code.
+2. **Phase.** The plan groups the features into phases. Each phase has goals and exit criteria (below).
+3. **Slice.** When a phase starts, it is split into slices, listed on the phase's **Slices** line, and the maintainer confirms the list before any code is written. A slice is one pull request that a person can review in one sitting: one concern, its own tests and doc updates, and it passes `pnpm check` on its own.
+
+Rules for slices:
+
+- **One slice at a time.** Build it, review it, merge it, and only then start the next. Never build several slices of a phase together: a correction in review would force changes in the others.
+- If a review answer affects a later slice, fix only the slice under review and note which later slice will need changes. Do not pre-build it.
+- After a merge, check `main` (a fresh clone, then `pnpm check`) before starting the next slice.
+- Change the spec before or together with the behaviour. When plans or decisions change, update the plan (checklist, status, log) and the decision log in the same slice. Never delete an ADR: add a new one and mark the old one superseded.
+- The slice list can change as a phase unfolds. Update the **Slices** line when it does.
+
 ---
 
 ## Phase 0: Scaffold and docs (done)

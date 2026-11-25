@@ -2,7 +2,7 @@
 
 An [MCP](https://modelcontextprotocol.io) server that lets AI assistants answer questions about school results (classes, scores, rankings, report-card data), with a tested tool surface and a reproducible eval suite.
 
-> **Status: Phase 0 complete (scaffold).** One tool works end to end. See the [implementation plan](docs/IMPLEMENTATION_PLAN.md) for what's next.
+> **Status: Phase 2 in progress (Postgres, tenancy, auth).** Phases 0 and 1 are done: the grading logic and the read-only tools work against synthetic in-memory data. See the [implementation plan](docs/IMPLEMENTATION_PLAN.md) for what's next.
 
 > **All data in this repository is synthetic.** No real students, schools or records are used, ever.
 
@@ -127,7 +127,7 @@ docs/          spec, plan, decision log, AI workflow
 
 ## How this project is run
 
-Work is spec-first and phase-based, and AI assistance is used under written rules. Read:
+Work is spec-first: feature, then phases, then slices of one reviewable pull request each, built one at a time. AI assistance is used under written rules. Read:
 
 - [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md): what we're building and what we're not
 - [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md): phases, tasks, and exit criteria
