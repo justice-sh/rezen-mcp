@@ -22,6 +22,10 @@ export const envSchema = z
 
     // Which Postgres runs behind DATABASE_URL: a Docker container or one installed locally.
     DB_PROVIDER: dbProviderSchema.default("docker"),
+
+    // Where the server reads its data from: the in-memory synthetic dataset or Postgres
+    // (which needs DATABASE_URL, a migrated and seeded database; see ADR-019).
+    DATA_STORE: z.enum(["memory", "postgres"]).default("memory"),
   })
   .transform((env, ctx) => {
     const dbUrl = getDatabaseUrl(env, ctx);

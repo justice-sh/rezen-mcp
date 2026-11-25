@@ -51,6 +51,17 @@ DB_PROVIDER=docker
 
 `.env.example` has the values for both providers. The data is synthetic and the credentials are throwaway.
 
+### Choosing the data store
+
+`DATA_STORE` says where the server reads its data. `memory` (the default) is the synthetic dataset in memory and needs no database. `postgres` reads the database behind `DATABASE_URL`, so migrate and seed it first. Both give the same answers (ADR-019).
+
+```bash
+pnpm pre-deploy                       # migrate and seed the database
+DATA_STORE=postgres pnpm dev          # or set DATA_STORE in .env
+```
+
+With `postgres`, the server checks the database at startup and stops with a message that says what to do if it cannot be reached, has no tables, or has no current term.
+
 ### Tests and the test database
 
 Tests need a Postgres. Each test file gets its own throwaway database, so files run in parallel without sharing state (ADR-015). Set it up once:
@@ -113,13 +124,13 @@ Full definitions live in [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md).
 
 ```
 src/
-  data/        domain types, synthetic data generator, repository interface
+  data/        domain types, synthetic data generator, repository interface, data store switch
   domain/      pure grading logic: totals, grades, ranking
   tools/       one file per MCP tool
   resources/   MCP resources (grading rules)
   prompts/     MCP prompt templates
   config/      layered env loading and the validated config schema
-  db/          Postgres connection layer (docker or local provider)
+  db/          Postgres connection layer (docker or local provider), schema, seed, PostgresRepository
   server.ts    builds the MCP server and registers tools
   index.ts     stdio entry point
 tests/         unit tests and tests through a real MCP client
