@@ -40,6 +40,13 @@ pnpm db:migrate # apply the migrations in drizzle/ to that database
 
 The schema lives in `src/db/schema.ts`. After changing it, run `pnpm db:generate` and commit the new file in `drizzle/` (ADR-016).
 
+If you use both, `DATABASE_URL` can hold a URL for each provider as JSON, and `DB_PROVIDER` alone picks one. Keep the single quotes in an env file. Production must use a single URL (ADR-017):
+
+```
+DATABASE_URL='{"docker":"postgresql://rezen:rezen@localhost:15432/rezen_mcp","local":"postgresql://postgres:postgres@localhost:5432/rezen_mcp"}'
+DB_PROVIDER=docker
+```
+
 `.env.example` has the values for both providers. The data is synthetic and the credentials are throwaway.
 
 ### Tests and the test database

@@ -57,10 +57,10 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 
 **Goal:** real persistence and provable school isolation.
 
-- [x] Config flow: layered env files (`.env`, then `.env.<NODE_ENV>`, with real environment variables winning), one validated schema, env files never committed (ADR-013)
-- [x] Database connection layer: one `DATABASE_URL`, `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014)
+- [x] Config flow: layered env files (ADR-013)
+- [x] Database connection layer (ADR-014)
 - [x] Parallel-safe test databases: one throwaway database per test file, a test-mode guard, setup and purge scripts, Postgres in CI (ADR-015)
-- [x] Data-access approach chosen and documented: `postgres` driver with Drizzle (ADR-014)
+- [x] Choose and document the data-access approach (ADR-013 config, ADR-014 Postgres access)
 - [x] Schema and migrations (ADR-016)
 - [ ] Seed script inserts the synthetic dataset
 - [ ] `PostgresRepository` implementing `Repository`
@@ -132,3 +132,4 @@ Phases are small enough to finish in days, and each has **exit criteria**: a pha
 | 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014).                           |
 | 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015). |
 | 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                   |
+| 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                              |
