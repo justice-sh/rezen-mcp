@@ -35,7 +35,10 @@ From Phase 2 the app can use Postgres through one `DATABASE_URL`. `DB_PROVIDER` 
 pnpm db:up      # docker provider: start Postgres from docker-compose.yml (port 15432)
 pnpm db:check   # show which database the app uses and whether it answers
 pnpm db:down    # stop the container
+pnpm db:migrate # apply the migrations in drizzle/ to that database
 ```
+
+The schema lives in `src/db/schema.ts`. After changing it, run `pnpm db:generate` and commit the new file in `drizzle/` (ADR-016).
 
 `.env.example` has the values for both providers. The data is synthetic and the credentials are throwaway.
 
