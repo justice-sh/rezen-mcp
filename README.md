@@ -36,6 +36,8 @@ pnpm db:up      # docker provider: start Postgres from docker-compose.yml (port 
 pnpm db:check   # show which database the app uses and whether it answers
 pnpm db:down    # stop the container
 pnpm db:migrate # apply the migrations in drizzle/ to that database
+pnpm db:seed    # insert the synthetic dataset (safe to repeat; migrate first)
+pnpm pre-deploy # db:migrate, then db:seed: run it on every deploy
 ```
 
 The schema lives in `src/db/schema.ts`. After changing it, run `pnpm db:generate` and commit the new file in `drizzle/` (ADR-016).

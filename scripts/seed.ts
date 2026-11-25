@@ -1,7 +1,7 @@
 import { generateDataset } from "../src/data/synthetic.js";
 
-// Phase 0/1: print a summary of the synthetic dataset.
-// Phase 2: this script will insert the dataset into Postgres.
+// Prints a summary of the synthetic dataset. It does not touch a database:
+// `pnpm db:seed` inserts the dataset into Postgres.
 const data = generateDataset();
 console.log(
   JSON.stringify(

@@ -78,7 +78,7 @@ Rules for slices:
 - [x] Parallel-safe test databases: one throwaway database per test file, a test-mode guard, setup and purge scripts, Postgres in CI (ADR-015)
 - [x] Choose and document the data-access approach (ADR-013 config, ADR-014 Postgres access)
 - [x] Schema and migrations (ADR-016)
-- [ ] Seed script inserts the synthetic dataset
+- [x] Seed script inserts the synthetic dataset, safe to repeat; `pre-deploy` migrates then seeds (ADR-018)
 - [ ] `PostgresRepository` implementing `Repository`
 - [ ] Repository contract tests run against both implementations
 - [ ] Per-school tokens; server derives school from the token
@@ -149,3 +149,4 @@ Rules for slices:
 | 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015). |
 | 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                   |
 | 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                              |
+| 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                        |
