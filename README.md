@@ -136,7 +136,7 @@ Full definitions live in [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md).
 
 ```
 src/
-  data/        domain types, synthetic data generator, repository interface, data store switch
+  data/        domain types, synthetic data generator, repository interface, one school's view of it, data store switch
   domain/      pure grading logic: totals, grades, ranking
   tools/       one file per MCP tool
   resources/   MCP resources (grading rules)
