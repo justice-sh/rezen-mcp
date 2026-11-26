@@ -1,7 +1,7 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { InMemoryRepository, createInMemoryRepository } from "../src/data/repository.js";
-import { CLASS_ID, edgeCaseDataset } from "./fixtures.js";
+import { CLASS_ID, edgeCaseDataset, SCHOOL_ID } from "./fixtures.js";
 import { callError, callOk, connect } from "./helpers.js";
 
 interface SubjectRow {
@@ -48,7 +48,7 @@ describe("tools against the edge-case fixture", () => {
   let client: Client;
 
   beforeEach(async () => {
-    client = await connect(new InMemoryRepository(edgeCaseDataset()));
+    client = await connect(new InMemoryRepository(edgeCaseDataset()), SCHOOL_ID);
   });
   afterEach(async () => {
     await client.close();
@@ -183,6 +183,7 @@ describe("tools against the edge-case fixture", () => {
     it("is the current term even when a later term already has data", async () => {
       const earlier = await connect(
         new InMemoryRepository({ ...edgeCaseDataset(), currentTerm: "2026-T1" }),
+        SCHOOL_ID,
       );
       const data = await callOk<Ranking>(earlier, "rank_class", { classId: CLASS_ID });
       expect(data.term).toBe("2026-T1");
@@ -252,7 +253,7 @@ describe("tools against the generated synthetic dataset", () => {
   let client: Client;
 
   beforeEach(async () => {
-    client = await connect(createInMemoryRepository());
+    client = await connect(createInMemoryRepository(), "sch_demo_a");
   });
   afterEach(async () => {
     await client.close();
@@ -262,7 +263,7 @@ describe("tools against the generated synthetic dataset", () => {
     const classes = await callOk<{ classes: { id: string; studentCount: number }[] }>(
       client,
       "list_classes",
-      { schoolId: "sch_demo_a" },
+      {},
     );
     for (const c of classes.classes) {
       const data = await callOk<Ranking>(client, "rank_class", { classId: c.id });
@@ -281,10 +282,16 @@ describe("tools against the generated synthetic dataset", () => {
   });
 
   it("class results cover every student in the class", async () => {
-    const data = await callOk<ClassResults>(client, "get_class_results", {
-      classId: "sch_demo_b_c2",
-    });
-    expect(data.students).toHaveLength(12);
-    expect(data.subjects).toHaveLength(4);
+    // School B's own server: its classes are reachable there, and only there.
+    const schoolB = await connect(createInMemoryRepository(), "sch_demo_b");
+    try {
+      const data = await callOk<ClassResults>(schoolB, "get_class_results", {
+        classId: "sch_demo_b_c2",
+      });
+      expect(data.students).toHaveLength(12);
+      expect(data.subjects).toHaveLength(4);
+    } finally {
+      await schoolB.close();
+    }
   });
 });

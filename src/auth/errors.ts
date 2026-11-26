@@ -1,4 +1,5 @@
-export type TokenErrorKind = "unknown-school" | "invalid-label";
+export type TokenErrorKind =
+  "unknown-school" | "invalid-label" | "token-missing" | "token-rejected";
 
 /** A token problem the caller can fix. Messages never contain a token. */
 export class TokenError extends Error {

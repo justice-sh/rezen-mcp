@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Repository } from "../data/repository.js";
+import type { SchoolRepository } from "../data/school-repository.js";
 import { loadClassResults } from "./class-data.js";
 import { classIdInput, classRefSchema, subjectResultSchema, termInput } from "./schemas.js";
 
@@ -26,7 +26,7 @@ export const getClassResultsOutput = {
 };
 
 export async function getClassResults(
-  repo: Repository,
+  repo: SchoolRepository,
   args: { classId: string; term?: string | undefined },
 ) {
   const loaded = await loadClassResults(repo, args.classId, args.term);

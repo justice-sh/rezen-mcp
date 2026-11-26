@@ -12,7 +12,7 @@ describe("resources and prompts", () => {
   let client: Client;
 
   beforeEach(async () => {
-    client = await connect(createInMemoryRepository());
+    client = await connect(createInMemoryRepository(), "sch_demo_a");
   });
   afterEach(async () => {
     await client.close();

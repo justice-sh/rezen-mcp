@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { Repository } from "./data/repository.js";
+import type { SchoolRepository } from "./data/school-repository.js";
 import {
   FIND_MISSING_SCORES_DESCRIPTION,
   findMissingScores,
@@ -18,12 +18,7 @@ import {
   getStudentReportInput,
   getStudentReportOutput,
 } from "./tools/get-student-report.js";
-import {
-  LIST_CLASSES_DESCRIPTION,
-  listClasses,
-  listClassesInput,
-  listClassesOutput,
-} from "./tools/list-classes.js";
+import { LIST_CLASSES_DESCRIPTION, listClasses, listClassesOutput } from "./tools/list-classes.js";
 import {
   RANK_CLASS_DESCRIPTION,
   rankClass,
@@ -37,7 +32,12 @@ import { SERVER_NAME, SERVER_VERSION } from "./version.js";
 /** Every tool is read-only and only touches this server's own data. */
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false } as const;
 
-export function createServer(repo: Repository): McpServer {
+/**
+ * Makes the server for one school. Every tool reads through `school`, a view that
+ * is already limited to the caller's school (ADR-021, ADR-022), so no tool takes a
+ * school ID and none can be asked for another school's data.
+ */
+export function createServer(school: SchoolRepository): McpServer {
   const server = new McpServer({ name: SERVER_NAME, version: SERVER_VERSION });
 
   server.registerTool(
@@ -45,11 +45,10 @@ export function createServer(repo: Repository): McpServer {
     {
       title: "List classes",
       description: LIST_CLASSES_DESCRIPTION,
-      inputSchema: listClassesInput,
       outputSchema: listClassesOutput,
       annotations: READ_ONLY,
     },
-    (args) => listClasses(repo, args),
+    () => listClasses(school),
   );
 
   server.registerTool(
@@ -61,7 +60,7 @@ export function createServer(repo: Repository): McpServer {
       outputSchema: getClassResultsOutput,
       annotations: READ_ONLY,
     },
-    (args) => getClassResults(repo, args),
+    (args) => getClassResults(school, args),
   );
 
   server.registerTool(
@@ -73,7 +72,7 @@ export function createServer(repo: Repository): McpServer {
       outputSchema: getStudentReportOutput,
       annotations: READ_ONLY,
     },
-    (args) => getStudentReport(repo, args),
+    (args) => getStudentReport(school, args),
   );
 
   server.registerTool(
@@ -85,7 +84,7 @@ export function createServer(repo: Repository): McpServer {
       outputSchema: rankClassOutput,
       annotations: READ_ONLY,
     },
-    (args) => rankClass(repo, args),
+    (args) => rankClass(school, args),
   );
 
   server.registerTool(
@@ -97,7 +96,7 @@ export function createServer(repo: Repository): McpServer {
       outputSchema: findMissingScoresOutput,
       annotations: READ_ONLY,
     },
-    (args) => findMissingScores(repo, args),
+    (args) => findMissingScores(school, args),
   );
 
   registerGradingRules(server);

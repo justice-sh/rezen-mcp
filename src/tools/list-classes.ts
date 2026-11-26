@@ -1,15 +1,8 @@
 import { z } from "zod";
-import type { Repository } from "../data/repository.js";
-import { notFound } from "./errors.js";
+import type { SchoolRepository } from "../data/school-repository.js";
+import { errorResult } from "./errors.js";
 
-export const listClassesInput = {
-  schoolId: z
-    .string()
-    .min(1)
-    .describe(
-      "The school's ID, e.g. 'sch_demo_a'. Phase 2 replaces this with token-scoped access.",
-    ),
-};
+// No input: the school comes from the caller's token, never from an argument (ADR-022).
 
 export const listClassesOutput = {
   school: z.string(),
@@ -24,15 +17,17 @@ export const listClassesOutput = {
 };
 
 export const LIST_CLASSES_DESCRIPTION =
-  "List the classes in a school, with grade level and number of students. " +
+  "List the classes in your school, with grade level and number of students. " +
+  "Takes no input: the school is the one your access token belongs to. " +
   "Use this first to discover class IDs before asking for results or reports.";
 
-export async function listClasses(repo: Repository, args: { schoolId: string }) {
-  const school = await repo.getSchool(args.schoolId);
-  if (!school) return notFound("school", args.schoolId);
+export async function listClasses(school: SchoolRepository) {
+  const found = await school.getSchool();
+  // A verified token always names a real school (ADR-020), so this is a safety net.
+  if (!found) return errorResult("No school data is available for this access.");
 
-  const classes = await repo.listClasses(school.id);
-  const structured = { school: school.name, classes };
+  const classes = await school.listClasses();
+  const structured = { school: found.name, classes };
   return {
     content: [{ type: "text" as const, text: JSON.stringify(structured, null, 2) }],
     structuredContent: structured,

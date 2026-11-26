@@ -1,4 +1,4 @@
-import type { Repository } from "../data/repository.js";
+import type { SchoolRepository } from "../data/school-repository.js";
 import { unknownTerm, type ToolError } from "./errors.js";
 
 export type TermResolution = { ok: true; term: string } | { ok: false; error: ToolError };
@@ -9,7 +9,7 @@ export type TermResolution = { ok: true; term: string } | { ok: false; error: To
  * (see docs/DECISIONS.md, ADR-009).
  */
 export async function resolveTerm(
-  repo: Repository,
+  repo: Pick<SchoolRepository, "getCurrentTerm" | "listTerms">,
   requested: string | undefined,
 ): Promise<TermResolution> {
   if (requested === undefined) {

@@ -61,7 +61,19 @@ pnpm db:token list                            # tokens without their values (--s
 pnpm db:token revoke <tokenId>                # stop a token from working
 ```
 
-The server does not use tokens yet: the next slices make it derive the school from the token.
+### Who is calling
+
+The server serves **one school**, decided once when it starts, and no tool takes a school ID (ADR-022). Which school depends on the data store:
+
+- `DATA_STORE=postgres`: set `SCHOOL_TOKEN` to a token from `pnpm db:token issue`. The school is the one the token belongs to. The server will not start without a valid token, and a malformed, unknown and revoked token all give the same message.
+- `DATA_STORE=memory` (the default): there are no tokens, so `SCHOOL_ID` picks the school and defaults to `sch_demo_a`.
+
+```bash
+SCHOOL_ID=sch_demo_b pnpm dev                       # in-memory data, school B
+DATA_STORE=postgres SCHOOL_TOKEN=rzn_... pnpm dev   # Postgres, the token's school
+```
+
+A setting that would be ignored is an error: `SCHOOL_TOKEN` with `memory`, or `SCHOOL_ID` with `postgres`. A token is checked when the server starts, so revoking one stops the next start, not a server that is already running.
 
 ### Choosing the data store
 
@@ -107,7 +119,7 @@ This starts the server from source over stdio and prints a local URL (the page o
 
 Things to try:
 
-- **Tools:** call `list_classes` with `schoolId` set to `sch_demo_a`, then use a returned class ID with `get_class_results` or `rank_class`.
+- **Tools:** call `list_classes` (it takes no input and lists the classes of `sch_demo_a`; set `SCHOOL_ID` to see school B), then use a returned class ID with `get_class_results` or `rank_class`.
 - **Resources:** read `rezen://grading-rules`.
 - **Prompts:** run `summarise_class_term`.
 
@@ -115,13 +127,13 @@ Press `Ctrl+C` in the terminal to stop it. The Inspector also has a CLI mode tha
 
 ## Tools
 
-| Tool                  | Status | Purpose                                              |
-| --------------------- | ------ | ---------------------------------------------------- |
-| `list_classes`        | Done   | List a school's classes with level and student count |
-| `get_class_results`   | Done   | Scores for a class and term                          |
-| `get_student_report`  | Done   | One student's report-card data                       |
-| `rank_class`          | Done   | Class ranking with documented tie handling           |
-| `find_missing_scores` | Done   | Flag incomplete score entries                        |
+| Tool                  | Status | Purpose                                                 |
+| --------------------- | ------ | ------------------------------------------------------- |
+| `list_classes`        | Done   | List your school's classes with level and student count |
+| `get_class_results`   | Done   | Scores for a class and term                             |
+| `get_student_report`  | Done   | One student's report-card data                          |
+| `rank_class`          | Done   | Class ranking with documented tie handling              |
+| `find_missing_scores` | Done   | Flag incomplete score entries                           |
 
 Full definitions live in [`docs/FEATURE_SPEC.md`](docs/FEATURE_SPEC.md).
 
@@ -142,7 +154,7 @@ src/
   resources/   MCP resources (grading rules)
   prompts/     MCP prompt templates
   config/      layered env loading and the validated config schema
-  auth/        per-school tokens: generate, hash, issue, verify, revoke
+  auth/        per-school tokens: generate, hash, issue, verify, revoke; which school this server serves
   db/          Postgres connection layer (docker or local provider), schema, seed, PostgresRepository
   server.ts    builds the MCP server and registers tools
   index.ts     stdio entry point

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Repository } from "../data/repository.js";
+import type { SchoolRepository } from "../data/school-repository.js";
 import { rankStudents } from "../domain/grading.js";
 import { loadClassResults } from "./class-data.js";
 import { notFound } from "./errors.js";
@@ -28,7 +28,7 @@ export const getStudentReportOutput = {
 };
 
 export async function getStudentReport(
-  repo: Repository,
+  repo: SchoolRepository,
   args: { studentId: string; term?: string | undefined },
 ) {
   const student = await repo.getStudent(args.studentId);
