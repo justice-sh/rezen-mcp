@@ -22,6 +22,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:seed": "tsx scripts/db-seed.ts",
+    "db:token": "tsx scripts/db-token.ts",
     "pre-deploy": "pnpm db:migrate && pnpm db:seed",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

@@ -1,5 +1,5 @@
 import type { Config } from "../config/index.js";
-import { createDatabase, DatabaseError, findSqlError, PostgresRepository } from "../db/index.js";
+import { createDatabase, findSqlError, notMigrated, PostgresRepository } from "../db/index.js";
 import { createInMemoryRepository, type Repository } from "./repository.js";
 
 /** The repository the server reads from, and how to let go of what it holds. */
@@ -51,13 +51,7 @@ async function verifyReadable(repository: Repository): Promise<void> {
   try {
     await repository.getCurrentTerm();
   } catch (error) {
-    if (findSqlError(error)?.code === "42P01") {
-      throw new DatabaseError(
-        "not-migrated",
-        'The database has no tables yet. Run "pnpm db:migrate" first (or "pnpm pre-deploy", which migrates and then seeds).',
-        { cause: error },
-      );
-    }
+    if (findSqlError(error)?.code === "42P01") throw notMigrated(error);
     throw error;
   }
 }

@@ -19,7 +19,7 @@ afterAll(async () => {
 
 // Each test starts from empty tables. Only the tests do this: the seed never truncates.
 beforeEach(async () => {
-  await db.sql`truncate scores, students, classes, terms, subjects, schools`;
+  await db.sql`truncate school_tokens, scores, students, classes, terms, subjects, schools`;
 });
 
 async function count(table: string): Promise<number> {

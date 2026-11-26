@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { generateDataset } from "../data/synthetic.js";
 import type { Dataset } from "../data/types.js";
 import type { Database } from "./database.js";
-import { DatabaseError, findSqlError } from "./errors.js";
+import { DatabaseError, findSqlError, notMigrated } from "./errors.js";
 import * as schema from "./schema.js";
 
 /** How many rows one insert statement carries. Far below Postgres' limit on parameters. */
@@ -95,13 +95,7 @@ export async function seedDatabase(
     });
   } catch (error) {
     const sqlError = findSqlError(error);
-    if (sqlError?.code === "42P01") {
-      throw new DatabaseError(
-        "not-migrated",
-        'The database has no tables yet. Run "pnpm db:migrate" first (or "pnpm pre-deploy", which migrates and then seeds).',
-        { cause: error },
-      );
-    }
+    if (sqlError?.code === "42P01") throw notMigrated(error);
     if (sqlError !== undefined) {
       // Drizzle's own message repeats the query and its parameters (the row values).
       // The database's message names the problem without them.

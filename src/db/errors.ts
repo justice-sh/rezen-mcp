@@ -27,3 +27,12 @@ export function findSqlError(error: unknown): (Error & { code: string }) | undef
   }
   return undefined;
 }
+
+/** The error for a database that has no tables yet. One message, so every caller says the same thing. */
+export function notMigrated(cause: unknown): DatabaseError {
+  return new DatabaseError(
+    "not-migrated",
+    'The database has no tables yet. Run "pnpm db:migrate" first (or "pnpm pre-deploy", which migrates and then seeds).',
+    { cause },
+  );
+}
