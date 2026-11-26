@@ -1,4 +1,4 @@
-import type { Repository } from "../data/repository.js";
+import type { SchoolRepository } from "../data/school-repository.js";
 import type { SchoolClass } from "../data/types.js";
 import { computeStudentResult, type StudentResult } from "../domain/grading.js";
 import { notFound, type ToolError } from "./errors.js";
@@ -16,7 +16,7 @@ export type ClassResults =
 
 /** Shared by every class-based tool: validate the class and term, then compute each student's result. */
 export async function loadClassResults(
-  repo: Repository,
+  repo: SchoolRepository,
   classId: string,
   termArg: string | undefined,
 ): Promise<ClassResults> {

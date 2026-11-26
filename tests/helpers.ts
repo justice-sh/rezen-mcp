@@ -1,11 +1,20 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { Repository } from "../src/data/repository.js";
+import { scopeToSchool } from "../src/data/school-repository.js";
 import { createServer } from "../src/server.js";
 
-/** Connect a real MCP client to a real server over an in-memory transport. */
-export async function connect(repo: Repository): Promise<Client> {
-  const server = createServer(repo);
+/**
+ * Connect a real MCP client to a real server over an in-memory transport. The server
+ * serves one school, the way a token makes it do (ADR-022): `schoolId` says which.
+ */
+export async function connect(repo: Repository, schoolId: string): Promise<Client> {
+  return connectTo(createServer(scopeToSchool(repo, schoolId)));
+}
+
+/** Connect a real MCP client to a server that is already built. */
+export async function connectTo(server: McpServer): Promise<Client> {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: "test-client", version: "0.0.0" });
   await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);

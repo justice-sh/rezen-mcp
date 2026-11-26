@@ -49,6 +49,7 @@ describe("openDataStore", () => {
     stores.push(store);
     expect(store.repository).toBeInstanceOf(InMemoryRepository);
     expect(store.description).toContain("in-memory");
+    expect(store.tokens).toBeUndefined();
     expect(await store.repository.getCurrentTerm()).toBe("2026-T2");
   });
 
@@ -59,6 +60,7 @@ describe("openDataStore", () => {
     stores.push(store);
 
     expect(store.repository).toBeInstanceOf(PostgresRepository);
+    expect(store.tokens).toBeDefined();
     expect(await store.repository.getCurrentTerm()).toBe("2026-T2");
     expect(store.description).toContain(db.name);
     // A URL would carry the user and password before an "@".

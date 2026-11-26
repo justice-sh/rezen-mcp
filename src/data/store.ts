@@ -1,10 +1,13 @@
 import type { Config } from "../config/index.js";
+import { PostgresTokenStore, type TokenStore } from "../auth/token-store.js";
 import { createDatabase, findSqlError, notMigrated, PostgresRepository } from "../db/index.js";
 import { createInMemoryRepository, type Repository } from "./repository.js";
 
 /** The repository the server reads from, and how to let go of what it holds. */
 export interface DataStore {
   readonly repository: Repository;
+  /** Where school tokens are checked. Only Postgres has them; the in-memory store has none (ADR-022). */
+  readonly tokens: TokenStore | undefined;
   /** Short and safe to log: names the store, never credentials. */
   readonly description: string;
   /** Releases what the store holds (the Postgres pool). Safe to call twice. */
@@ -25,6 +28,7 @@ export async function openDataStore(
   if (config.DATA_STORE === "memory") {
     return {
       repository: createInMemoryRepository(),
+      tokens: undefined,
       description: "in-memory synthetic data",
       close: async () => {},
     };
@@ -37,6 +41,7 @@ export async function openDataStore(
     await verifyReadable(repository);
     return {
       repository,
+      tokens: new PostgresTokenStore(database),
       description: `${database.provider} Postgres at ${database.target}`,
       close: () => database.close(),
     };

@@ -8,7 +8,7 @@ export function errorResult(message: string) {
 
 export type ToolError = ReturnType<typeof errorResult>;
 
-export function notFound(kind: "school" | "class" | "student", id: string): ToolError {
+export function notFound(kind: "class" | "student", id: string): ToolError {
   return errorResult(`Unknown ${kind} ID '${id}'. Check the ID and try again.`);
 }
 

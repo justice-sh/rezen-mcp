@@ -26,6 +26,46 @@ function write(name: string, content: string): void {
   writeFileSync(path.join(dir, name), content);
 }
 
+describe("SCHOOL_TOKEN and SCHOOL_ID (ADR-022)", () => {
+  const load = (env: Record<string, string>) => loadConfig({ cwd: dir, env });
+  const token = "rzn_" + "A".repeat(43);
+
+  it("are optional, and unset by default", () => {
+    const config = load({});
+    expect(config.SCHOOL_TOKEN).toBeUndefined();
+    expect(config.SCHOOL_ID).toBeUndefined();
+  });
+
+  it("accepts a token with postgres, and a school ID with memory", () => {
+    expect(load({ DATA_STORE: "postgres", SCHOOL_TOKEN: token }).SCHOOL_TOKEN).toBe(token);
+    expect(load({ DATA_STORE: "memory", SCHOOL_ID: "sch_demo_b" }).SCHOOL_ID).toBe("sch_demo_b");
+  });
+
+  it("treats empty values as unset", () => {
+    const config = load({ SCHOOL_TOKEN: "", SCHOOL_ID: "" });
+    expect(config.SCHOOL_TOKEN).toBeUndefined();
+    expect(config.SCHOOL_ID).toBeUndefined();
+  });
+
+  it("rejects a token with memory, which would ignore it, without printing it", () => {
+    const error = (() => {
+      try {
+        load({ DATA_STORE: "memory", SCHOOL_TOKEN: token });
+      } catch (e) {
+        return e as Error;
+      }
+      return undefined;
+    })();
+    expect(error).toBeInstanceOf(ConfigError);
+    expect(error?.message).toContain("SCHOOL_TOKEN");
+    expect(error?.message).not.toContain(token);
+  });
+
+  it("rejects a school ID with postgres, where the token decides", () => {
+    expect(() => load({ DATA_STORE: "postgres", SCHOOL_ID: "sch_demo_a" })).toThrow(/SCHOOL_ID/);
+  });
+});
+
 describe("resolveEnv", () => {
   it("reads .env on its own, and works when no files exist", () => {
     write(".env", "A=from-base\nB=only-base\n");
