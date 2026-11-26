@@ -81,7 +81,8 @@ Rules for slices:
 - [x] Seed script inserts the synthetic dataset, safe to repeat; `pre-deploy` migrates then seeds (ADR-018)
 - [x] `PostgresRepository` implementing `Repository`, chosen by `DATA_STORE` (ADR-019)
 - [x] Repository contract tests run against both implementations (ADR-019)
-- [ ] Per-school tokens; server derives school from the token
+- [x] Per-school tokens: issue, check and revoke, with only hashes stored (ADR-020)
+- [ ] Server derives the school from the token
 - [ ] Row-level security policies as a second isolation layer
 - [ ] Remove `schoolId` from tool inputs (documented breaking change)
 - [ ] Isolation tests: school A's token against every tool and every school B ID
@@ -137,17 +138,18 @@ Rules for slices:
 
 ## Status log
 
-| Date       | Update                                                                                                                                                           |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                                                                  |
-| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                                                             |
-| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client.                                    |
-| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                                                                |
-| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).                                                 |
-| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).                                               |
-| 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014).                           |
-| 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015). |
-| 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                   |
-| 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                              |
-| 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                        |
-| 2026-11-25 | Phase 2 slice 6: `PostgresRepository`, one defined order for every list, `DATA_STORE` switch, shared contract tests on both stores (ADR-019).                    |
+| Date       | Update                                                                                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                                                                        |
+| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                                                                   |
+| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client.                                          |
+| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                                                                      |
+| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).                                                       |
+| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).                                                     |
+| 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014).                                 |
+| 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015).       |
+| 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                         |
+| 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                                    |
+| 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                              |
+| 2026-11-25 | Phase 2 slice 6: `PostgresRepository`, one defined order for every list, `DATA_STORE` switch, shared contract tests on both stores (ADR-019).                          |
+| 2026-11-25 | Phase 2 slice 7: per-school tokens (`src/auth`, `school_tokens`), `pnpm db:token` to issue, list and revoke; only hashes stored; seeding never makes tokens (ADR-020). |

@@ -51,6 +51,18 @@ DB_PROVIDER=docker
 
 `.env.example` has the values for both providers. The data is synthetic and the credentials are throwaway.
 
+### School tokens
+
+Each school gets its own access token. Tokens are made by a command, shown once, and stored only as a hash, so the database cannot give them away (ADR-020). Seeding never makes tokens.
+
+```bash
+pnpm db:token issue sch_demo_a --label demo   # make a token for a school; copy it now
+pnpm db:token list                            # tokens without their values (--school <id> to filter)
+pnpm db:token revoke <tokenId>                # stop a token from working
+```
+
+The server does not use tokens yet: the next slices make it derive the school from the token.
+
 ### Choosing the data store
 
 `DATA_STORE` says where the server reads its data. `memory` (the default) is the synthetic dataset in memory and needs no database. `postgres` reads the database behind `DATABASE_URL`, so migrate and seed it first. Both give the same answers (ADR-019).
@@ -130,11 +142,12 @@ src/
   resources/   MCP resources (grading rules)
   prompts/     MCP prompt templates
   config/      layered env loading and the validated config schema
+  auth/        per-school tokens: generate, hash, issue, verify, revoke
   db/          Postgres connection layer (docker or local provider), schema, seed, PostgresRepository
   server.ts    builds the MCP server and registers tools
   index.ts     stdio entry point
 tests/         unit tests and tests through a real MCP client
-scripts/       seed script
+scripts/       seed, migrate and token scripts
 docs/          spec, plan, decision log, AI workflow
 ```
 

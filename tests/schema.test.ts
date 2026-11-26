@@ -50,6 +50,7 @@ const TABLES = [
   schema.subjects,
   schema.terms,
   schema.scores,
+  schema.schoolTokens,
 ];
 
 describe("migrations", () => {
@@ -193,5 +194,43 @@ describe("terms and subjects", () => {
       () => db.sql`insert into subjects (name, position) values ('Civic Education', 1)`,
       UNIQUE_VIOLATION,
     );
+  });
+});
+
+describe("token constraints", () => {
+  const HASH = "a".repeat(64);
+  const insert = (id: string, hash: string, schoolId = "sch_a") =>
+    db.sql`insert into school_tokens (id, school_id, token_hash) values (${id}, ${schoolId}, ${hash})`;
+
+  it("store a hash, with the creation time filled in and no revocation", async () => {
+    await insert("tok_1", HASH);
+    try {
+      const [row] = await db.sql<{ created_at: string | null; revoked_at: string | null }[]>`
+        select created_at, revoked_at from school_tokens where id = 'tok_1'`;
+      // Filled in by the database (as a recent time), and not revoked.
+      expect(Date.now() - new Date(row?.created_at ?? "").getTime()).toBeLessThan(60_000);
+      expect(row?.revoked_at).toBeNull();
+    } finally {
+      await db.sql`delete from school_tokens where id = 'tok_1'`;
+    }
+  });
+
+  it("reject anything that is not a lowercase SHA-256 hex digest, so a plaintext token cannot be stored", async () => {
+    await expectSqlState(() => insert("tok_2", `rzn_${"A".repeat(43)}`), CHECK_VIOLATION);
+    await expectSqlState(() => insert("tok_2", "a".repeat(63)), CHECK_VIOLATION);
+    await expectSqlState(() => insert("tok_2", "A".repeat(64)), CHECK_VIOLATION);
+  });
+
+  it("allow each hash only once", async () => {
+    await insert("tok_3", HASH);
+    try {
+      await expectSqlState(() => insert("tok_4", HASH, "sch_b"), UNIQUE_VIOLATION);
+    } finally {
+      await db.sql`delete from school_tokens where id = 'tok_3'`;
+    }
+  });
+
+  it("reject a token for a school that does not exist", async () => {
+    await expectSqlState(() => insert("tok_5", HASH, "sch_missing"), FOREIGN_KEY_VIOLATION);
   });
 });

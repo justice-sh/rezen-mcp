@@ -3,7 +3,7 @@
 |                  |                      |
 | ---------------- | -------------------- |
 | **Status**       | Draft v0.1 (Phase 0) |
-| **Last updated** | 2026-11-20           |
+| **Last updated** | 2026-11-25           |
 | **Owner**        | Justice N.           |
 
 ## 1. Problem
@@ -111,9 +111,10 @@ All tools are read-only (`readOnlyHint: true`). An unknown ID and a different sc
 - **Phase 2:** one token per school. The server derives the school from the token. Postgres **row-level security** enforces isolation as a second layer. Tool inputs no longer include `schoolId` (a documented breaking change).
 - No personal data in logs. Inputs validated with Zod. No secrets in the repository.
 - Configuration comes from environment variables, validated at startup in one place. Files are layered (`.env`, then `.env.<NODE_ENV>`) and real environment variables always win (ADR-013). Postgres is reached through one `DATABASE_URL`; `DB_PROVIDER` (`docker` or `local`) selects the implementation (ADR-014). In development and test, `DATABASE_URL` may instead be a JSON map of provider to URL, resolved to one string by `DB_PROVIDER`; production always uses a single URL (ADR-017).
-- **Data model (Phase 2, ADR-016):** `schools`, `classes`, `students`, `subjects`, `terms` and `scores` in Postgres. Every tenant table (`classes`, `students`, `scores`) carries `school_id`, and the database rejects a row whose school differs from its parent's. Score ranges (CA 0 to 40, exam 0 to 60) are enforced in the database too. At most one term is current, globally.
+- **Data model (Phase 2, ADR-016, ADR-020):** `schools`, `classes`, `students`, `subjects`, `terms`, `scores` and `school_tokens` in Postgres. Every tenant table (`classes`, `students`, `scores`) carries `school_id`, and the database rejects a row whose school differs from its parent's. Score ranges (CA 0 to 40, exam 0 to 60) are enforced in the database too. At most one term is current, globally.
 - **Data store (Phase 2, ADR-019):** `DATA_STORE` is `memory` (the default: the synthetic dataset, no database) or `postgres` (the database behind `DATABASE_URL`, migrated and seeded). Both give identical answers in the same order. Lists are ordered: classes by level then ID, students by name then ID, scores by student ID then subject, subjects and terms in their defined order; text is compared by its bytes. With `postgres`, the server checks the database when it starts and refuses to start if it cannot be reached, has no tables, or has no current term.
 - **Seeding (Phase 2, ADR-018):** `pnpm db:seed` inserts the synthetic dataset, and `pnpm pre-deploy` migrates and then seeds. Seeding is safe to repeat: it only inserts rows that are missing, never changes or deletes existing rows, and never moves the current term.
+- **Tokens (Phase 2, ADR-020):** a token is `rzn_` and 43 random base64url characters. Only its SHA-256 hash is stored, in `school_tokens`, with the school, an optional label, and creation and revocation times; the token cannot be recovered from the database. A school can have several tokens. `pnpm db:token issue <schoolId> [--label text]` makes one and shows it once; `list [--school id]` shows tokens without their values; `revoke <tokenId>` stops one. Checking a token gives the school it belongs to, or nothing: a malformed, unknown and revoked token all look the same. Tokens do not expire in v1. Seeding never creates tokens. Using tokens in the server is the next slices' work.
 - A test must prove school A's token can never read school B's data, through every tool.
 
 ## 9. Evals

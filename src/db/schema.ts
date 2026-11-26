@@ -8,6 +8,7 @@ import {
   pgTable,
   primaryKey,
   text,
+  timestamp,
   unique,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -131,5 +132,33 @@ export const scores = pgTable(
     }),
     check("scores_ca_range", sql`${table.ca} is null or ${table.ca} between 0 and 40`),
     check("scores_exam_range", sql`${table.exam} is null or ${table.exam} between 0 and 60`),
+  ],
+);
+
+/**
+ * Access tokens, one or more per school (ADR-020). Only the SHA-256 hash of a
+ * token is stored, never the token itself, so a copy of this table cannot be used
+ * to sign in. A token is revoked by setting `revoked_at`; the row is kept so
+ * there is a record of it.
+ */
+export const schoolTokens = pgTable(
+  "school_tokens",
+  {
+    id: text("id").primaryKey(),
+    schoolId: text("school_id")
+      .notNull()
+      .references(() => schools.id),
+    /** Lowercase hex SHA-256 of the token. */
+    tokenHash: text("token_hash").notNull(),
+    /** A short note for people, such as "demo". Never a secret or personal data. */
+    label: text("label"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("school_tokens_token_hash_key").on(table.tokenHash),
+    // A hash is 64 hex characters, so a plaintext token cannot be stored by mistake.
+    check("school_tokens_token_hash_format", sql`${table.tokenHash} ~ '^[0-9a-f]{64}$'`),
+    index("school_tokens_school_id_idx").on(table.schoolId),
   ],
 );
