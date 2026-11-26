@@ -82,6 +82,7 @@ Rules for slices:
 - [x] `PostgresRepository` implementing `Repository`, chosen by `DATA_STORE` (ADR-019)
 - [x] Repository contract tests run against both implementations (ADR-019)
 - [x] Per-school tokens: issue, check and revoke, with only hashes stored (ADR-020)
+- [x] School-scoped repository: one school's view, where another school's IDs look unknown (ADR-021)
 - [ ] Server derives the school from the token
 - [ ] Row-level security policies as a second isolation layer
 - [ ] Remove `schoolId` from tool inputs (documented breaking change)
@@ -153,3 +154,4 @@ Rules for slices:
 | 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                              |
 | 2026-11-25 | Phase 2 slice 6: `PostgresRepository`, one defined order for every list, `DATA_STORE` switch, shared contract tests on both stores (ADR-019).                          |
 | 2026-11-25 | Phase 2 slice 7: per-school tokens (`src/auth`, `school_tokens`), `pnpm db:token` to issue, list and revoke; only hashes stored; seeding never makes tokens (ADR-020). |
+| 2026-11-26 | Phase 2 slice 8: school-scoped repository (`scopeToSchool`); another school's IDs look unknown on both stores; not used by the server yet (ADR-021).                   |
