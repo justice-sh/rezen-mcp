@@ -1,22 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { InMemoryRepository, type Repository } from "../src/data/repository.js";
+import type { Repository } from "../src/data/repository.js";
 import { scopeToSchool } from "../src/data/school-repository.js";
 import { generateDataset } from "../src/data/synthetic.js";
-import type { Dataset } from "../src/data/types.js";
-import { openInMemorySubject, openPostgresSubject } from "./support/postgres-subject.js";
+import { openPostgresSubject } from "./support/postgres-subject.js";
 import type { ContractSubject } from "./support/repository-contract.js";
 
 // A school's view must give its own data exactly as the repository does, and
 // must make every other school's data look like an unknown ID (ADR-021). The
-// expected answers come from the dataset, and the same tests run on both stores.
+// expected answers come from the dataset; the data is in a real Postgres database.
 const dataset = generateDataset();
 const terms = [...dataset.terms, "1999-T1"];
 const UNKNOWN = "nope";
-
-const stores: [string, (dataset: Dataset) => Promise<ContractSubject>][] = [
-  ["in-memory", openInMemorySubject],
-  ["Postgres", openPostgresSubject],
-];
 
 describe("the dataset can show isolation", () => {
   it("has two schools, each with classes, students and scores", () => {
@@ -32,12 +26,12 @@ describe("the dataset can show isolation", () => {
   });
 });
 
-describe.each(stores)("a school's view over the %s store", (_name, open) => {
+describe("a school's view over Postgres", () => {
   let subject: ContractSubject;
   let repo: Repository;
 
   beforeAll(async () => {
-    subject = await open(dataset);
+    subject = await openPostgresSubject(dataset);
     repo = subject.repo;
   });
 
@@ -153,12 +147,22 @@ describe.each(stores)("a school's view over the %s store", (_name, open) => {
 });
 
 describe("how a school's view is built", () => {
+  let subject: ContractSubject;
+
+  beforeAll(async () => {
+    subject = await openPostgresSubject(dataset);
+  });
+
+  afterAll(async () => {
+    await subject?.close();
+  });
+
   it("refuses an empty school ID", () => {
-    expect(() => scopeToSchool(createRecorder().repo, "")).toThrow(/school ID/);
+    expect(() => scopeToSchool(createRecorder(subject.repo).repo, "")).toThrow(/school ID/);
   });
 
   it("does not read another school's students or scores at all", async () => {
-    const { repo, calls } = createRecorder();
+    const { repo, calls } = createRecorder(subject.repo);
     const [first, second] = dataset.schools;
     const view = scopeToSchool(repo, first?.id ?? "");
     const foreign = dataset.classes.find((c) => c.schoolId === second?.id);
@@ -171,16 +175,15 @@ describe("how a school's view is built", () => {
   });
 
   it("does not hand out the repository behind it", () => {
-    const view = scopeToSchool(createRecorder().repo, "sch_demo_a");
+    const view = scopeToSchool(createRecorder(subject.repo).repo, "sch_demo_a");
     expect(Object.keys(view).sort()).toEqual(["schoolId"]);
     expect(Object.getOwnPropertyNames(view).sort()).toEqual(["schoolId"]);
     expect(JSON.stringify(view)).toBe('{"schoolId":"sch_demo_a"}');
   });
 });
 
-/** An in-memory repository that records the names of the methods called on it. */
-function createRecorder(): { repo: Repository; calls: string[] } {
-  const real = new InMemoryRepository(dataset);
+/** Wraps a repository so that the names of the methods called on it are recorded. */
+function createRecorder(real: Repository): { repo: Repository; calls: string[] } {
   const calls: string[] = [];
   const repo = new Proxy(real, {
     get(target, property, receiver) {

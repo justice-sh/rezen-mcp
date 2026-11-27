@@ -1,4 +1,3 @@
-import { InMemoryRepository } from "../../src/data/repository.js";
 import type { Dataset } from "../../src/data/types.js";
 import { getConfig } from "../../src/config/index.js";
 import { migrateDatabase, PostgresRepository, seedDatabase } from "../../src/db/index.js";
@@ -22,11 +21,6 @@ export async function seededDatabase(dataset: Dataset): Promise<TestDatabase> {
 export async function openPostgresSubject(dataset: Dataset): Promise<ContractSubject> {
   const db = await seededDatabase(dataset);
   return { repo: new PostgresRepository(db), close: () => db.close() };
-}
-
-/** The in-memory repository for the same dataset. */
-export async function openInMemorySubject(dataset: Dataset): Promise<ContractSubject> {
-  return { repo: new InMemoryRepository(dataset), close: async () => {} };
 }
 
 /** The connection URL of a throwaway database (the test database's URL with its name). */

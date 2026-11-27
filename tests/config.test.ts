@@ -26,43 +26,59 @@ function write(name: string, content: string): void {
   writeFileSync(path.join(dir, name), content);
 }
 
-describe("SCHOOL_TOKEN and SCHOOL_ID (ADR-022)", () => {
+describe("SCHOOL_TOKEN (ADR-022)", () => {
   const load = (env: Record<string, string>) => loadConfig({ cwd: dir, env });
   const token = "rzn_" + "A".repeat(43);
 
-  it("are optional, and unset by default", () => {
-    const config = load({});
-    expect(config.SCHOOL_TOKEN).toBeUndefined();
-    expect(config.SCHOOL_ID).toBeUndefined();
+  it("is optional, and unset by default", () => {
+    expect(load({}).SCHOOL_TOKEN).toBeUndefined();
   });
 
-  it("accepts a token with postgres, and a school ID with memory", () => {
-    expect(load({ DATA_STORE: "postgres", SCHOOL_TOKEN: token }).SCHOOL_TOKEN).toBe(token);
-    expect(load({ DATA_STORE: "memory", SCHOOL_ID: "sch_demo_b" }).SCHOOL_ID).toBe("sch_demo_b");
+  it("is accepted", () => {
+    expect(load({ SCHOOL_TOKEN: token }).SCHOOL_TOKEN).toBe(token);
   });
 
-  it("treats empty values as unset", () => {
-    const config = load({ SCHOOL_TOKEN: "", SCHOOL_ID: "" });
-    expect(config.SCHOOL_TOKEN).toBeUndefined();
-    expect(config.SCHOOL_ID).toBeUndefined();
+  it("is treated as unset when empty", () => {
+    expect(load({ SCHOOL_TOKEN: "" }).SCHOOL_TOKEN).toBeUndefined();
+  });
+});
+
+describe("removed settings (ADR-023)", () => {
+  const load = (env: Record<string, string>) => loadConfig({ cwd: dir, env });
+  const messageOf = (env: Record<string, string>): string => {
+    try {
+      load(env);
+    } catch (e) {
+      return (e as Error).message;
+    }
+    throw new Error("Expected loadConfig to throw");
+  };
+
+  it("refuses DATA_STORE, whatever its value, and says to delete it", () => {
+    for (const value of ["memory", "postgres"]) {
+      const message = messageOf({ DATA_STORE: value });
+      expect(message).toContain("DATA_STORE");
+      expect(message).toContain("Delete it");
+    }
   });
 
-  it("rejects a token with memory, which would ignore it, without printing it", () => {
-    const error = (() => {
-      try {
-        load({ DATA_STORE: "memory", SCHOOL_TOKEN: token });
-      } catch (e) {
-        return e as Error;
-      }
-      return undefined;
-    })();
-    expect(error).toBeInstanceOf(ConfigError);
-    expect(error?.message).toContain("SCHOOL_TOKEN");
-    expect(error?.message).not.toContain(token);
+  it("refuses SCHOOL_ID, and says the token decides", () => {
+    const message = messageOf({ SCHOOL_ID: "sch_demo_a" });
+    expect(message).toContain("SCHOOL_ID");
+    expect(message).toContain("SCHOOL_TOKEN");
+    expect(message).not.toContain("sch_demo_a");
   });
 
-  it("rejects a school ID with postgres, where the token decides", () => {
-    expect(() => load({ DATA_STORE: "postgres", SCHOOL_ID: "sch_demo_a" })).toThrow(/SCHOOL_ID/);
+  it("reports both when both are set", () => {
+    const message = messageOf({ DATA_STORE: "memory", SCHOOL_ID: "sch_demo_a" });
+    expect(message).toContain("DATA_STORE");
+    expect(message).toContain("SCHOOL_ID");
+  });
+
+  it("does not mind them when they are empty, which counts as unset", () => {
+    const config = load({ DATA_STORE: "", SCHOOL_ID: "" });
+    expect("DATA_STORE" in config).toBe(false);
+    expect("SCHOOL_ID" in config).toBe(false);
   });
 });
 

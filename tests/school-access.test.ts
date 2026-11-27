@@ -1,13 +1,11 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
-  DEFAULT_MEMORY_SCHOOL_ID,
   generateToken,
   openSchoolAccess,
   PostgresTokenStore,
   TokenError,
 } from "../src/auth/index.js";
-import { createInMemoryRepository } from "../src/data/repository.js";
 import { generateDataset } from "../src/data/synthetic.js";
 import { PostgresRepository } from "../src/db/index.js";
 import { createServer } from "../src/server.js";
@@ -15,8 +13,8 @@ import { connectTo } from "./helpers.js";
 import { seededDatabase } from "./support/postgres-subject.js";
 import type { TestDatabase } from "./support/test-database.js";
 
-// How a server learns who is calling (ADR-022), end to end: from a token (Postgres)
-// or from SCHOOL_ID (memory), through to what a real MCP client can read.
+// How a server learns who is calling (ADR-022), end to end: from a token, through
+// to what a real MCP client can read.
 const dataset = generateDataset();
 const SCHOOL_A = "sch_demo_a";
 const SCHOOL_B = "sch_demo_b";
@@ -28,8 +26,6 @@ const studentOf = (schoolId: string) => {
   return dataset.students.find((s) => s.classId === cls)?.id ?? "";
 };
 
-const memoryStore = () => ({ repository: createInMemoryRepository(), tokens: undefined });
-
 async function errorOf(promise: Promise<unknown>): Promise<TokenError> {
   const error = await promise.then(
     () => undefined,
@@ -39,33 +35,7 @@ async function errorOf(promise: Promise<unknown>): Promise<TokenError> {
   return error as TokenError;
 }
 
-describe("openSchoolAccess over the in-memory store (no tokens)", () => {
-  it("serves the first demo school when SCHOOL_ID is not set", async () => {
-    const access = await openSchoolAccess(memoryStore(), {});
-    expect(DEFAULT_MEMORY_SCHOOL_ID).toBe(SCHOOL_A);
-    expect(access.repository.schoolId).toBe(SCHOOL_A);
-    expect(access.description).toContain(SCHOOL_A);
-  });
-
-  it("serves the school SCHOOL_ID names", async () => {
-    const access = await openSchoolAccess(memoryStore(), { SCHOOL_ID: SCHOOL_B });
-    expect(access.repository.schoolId).toBe(SCHOOL_B);
-    expect((await access.repository.getSchool())?.name).toBe("Demo School B");
-  });
-
-  it("stops, naming the school, when SCHOOL_ID is not a school in the data", async () => {
-    const error = await errorOf(openSchoolAccess(memoryStore(), { SCHOOL_ID: "sch_nope" }));
-    expect(error.kind).toBe("unknown-school");
-    expect(error.message).toContain("sch_nope");
-  });
-
-  it("does not need a token, and does not look at one", async () => {
-    const access = await openSchoolAccess(memoryStore(), { SCHOOL_TOKEN: generateToken() });
-    expect(access.repository.schoolId).toBe(SCHOOL_A);
-  });
-});
-
-describe("openSchoolAccess over Postgres (tokens)", () => {
+describe("openSchoolAccess (tokens over Postgres)", () => {
   let db: TestDatabase;
   let tokens: PostgresTokenStore;
   let store: { repository: PostgresRepository; tokens: PostgresTokenStore };
@@ -170,12 +140,15 @@ describe("openSchoolAccess over Postgres (tokens)", () => {
     expect(error.kind).toBe("token-rejected");
   });
 
-  it("does not use SCHOOL_ID: with tokens, the token decides", async () => {
-    const issued = await tokens.issue(SCHOOL_A);
-    const access = await openSchoolAccess(store, {
-      SCHOOL_TOKEN: issued.token,
-      SCHOOL_ID: SCHOOL_B,
-    });
-    expect(access.repository.schoolId).toBe(SCHOOL_A);
+  it("stops, naming the school, if a token's school is not in the data", async () => {
+    // Cannot happen with a real token (it refers to a school by foreign key), so this
+    // is the defence in depth, with a store that vouches for a school that is not there.
+    const vouching = {
+      repository: store.repository,
+      tokens: { verify: async () => ({ tokenId: "t", schoolId: "sch_nope" }) },
+    };
+    const error = await errorOf(openSchoolAccess(vouching, { SCHOOL_TOKEN: generateToken() }));
+    expect(error.kind).toBe("unknown-school");
+    expect(error.message).toContain("sch_nope");
   });
 });

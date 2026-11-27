@@ -9,9 +9,9 @@ export interface ContractSubject {
 }
 
 /**
- * The behaviour every `Repository` must have (ADR-004, ADR-019). Run it against
- * each implementation with the same dataset: the expected answers are worked out
- * here from the dataset itself, never from the implementation under test.
+ * The behaviour every `Repository` must have (ADR-004, ADR-019). The expected
+ * answers are worked out here from the dataset itself, never from the
+ * implementation under test.
  */
 export function describeRepositoryContract(
   name: string,

@@ -10,14 +10,14 @@ const { schools, classes, students, subjects, terms, scores } = schema;
 
 /**
  * Orders text by its bytes, whatever collation the database was created with, so
- * the order is the same on every server and the same as `InMemoryRepository`.
+ * the order is the same on every server (ADR-019).
  */
 const bytewise = (column: SQLWrapper) => sql`${column} collate "C"`;
 
 /**
- * The `Repository` over Postgres (ADR-019). It returns exactly what
- * `InMemoryRepository` returns for the same data; the contract tests in
- * `tests/support/repository-contract.ts` run against both.
+ * The `Repository` over Postgres (ADR-019), and its only implementation (ADR-023).
+ * The contract tests in `tests/support/repository-contract.ts` work out the
+ * expected answers from the dataset itself and run against this class.
  *
  * It does not own the `Database`: whoever created it closes it.
  */

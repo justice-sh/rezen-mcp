@@ -1,8 +1,10 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { InMemoryRepository, createInMemoryRepository } from "../src/data/repository.js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { generateDataset } from "../src/data/synthetic.js";
 import { CLASS_ID, edgeCaseDataset, SCHOOL_ID } from "./fixtures.js";
 import { callError, callOk, connect } from "./helpers.js";
+import { openPostgresSubject } from "./support/postgres-subject.js";
+import type { ContractSubject } from "./support/repository-contract.js";
 
 interface SubjectRow {
   subject: string;
@@ -44,14 +46,18 @@ interface Missing {
   missing: { studentId: string; name: string; subject: string; component: string }[];
 }
 
-describe("tools against the edge-case fixture", () => {
+// Every tool is a read, so each describe seeds one throwaway Postgres database and shares it.
+describe("tools against the edge-case fixture (Postgres)", () => {
+  let subject: ContractSubject;
   let client: Client;
 
-  beforeEach(async () => {
-    client = await connect(new InMemoryRepository(edgeCaseDataset()), SCHOOL_ID);
+  beforeAll(async () => {
+    subject = await openPostgresSubject(edgeCaseDataset());
+    client = await connect(subject.repo, SCHOOL_ID);
   });
-  afterEach(async () => {
-    await client.close();
+  afterAll(async () => {
+    await client?.close();
+    await subject?.close();
   });
 
   it("advertises exactly the five v1 tools, all read-only", async () => {
@@ -181,14 +187,17 @@ describe("tools against the edge-case fixture", () => {
 
   describe("default term", () => {
     it("is the current term even when a later term already has data", async () => {
-      const earlier = await connect(
-        new InMemoryRepository({ ...edgeCaseDataset(), currentTerm: "2026-T1" }),
-        SCHOOL_ID,
-      );
-      const data = await callOk<Ranking>(earlier, "rank_class", { classId: CLASS_ID });
-      expect(data.term).toBe("2026-T1");
-      expect(data.ranked).toHaveLength(4);
-      await earlier.close();
+      // The same data with the first term in progress, in a database of its own.
+      const first = await openPostgresSubject({ ...edgeCaseDataset(), currentTerm: "2026-T1" });
+      const earlier = await connect(first.repo, SCHOOL_ID);
+      try {
+        const data = await callOk<Ranking>(earlier, "rank_class", { classId: CLASS_ID });
+        expect(data.term).toBe("2026-T1");
+        expect(data.ranked).toHaveLength(4);
+      } finally {
+        await earlier.close();
+        await first.close();
+      }
     });
 
     it("is stated in every response, so callers always know which term they got", async () => {
@@ -249,14 +258,17 @@ describe("tools against the edge-case fixture", () => {
   });
 });
 
-describe("tools against the generated synthetic dataset", () => {
+describe("tools against the generated synthetic dataset (Postgres)", () => {
+  let subject: ContractSubject;
   let client: Client;
 
-  beforeEach(async () => {
-    client = await connect(createInMemoryRepository(), "sch_demo_a");
+  beforeAll(async () => {
+    subject = await openPostgresSubject(generateDataset());
+    client = await connect(subject.repo, "sch_demo_a");
   });
-  afterEach(async () => {
-    await client.close();
+  afterAll(async () => {
+    await client?.close();
+    await subject?.close();
   });
 
   it("ranked plus unranked students add up to the class size", async () => {
@@ -283,7 +295,7 @@ describe("tools against the generated synthetic dataset", () => {
 
   it("class results cover every student in the class", async () => {
     // School B's own server: its classes are reachable there, and only there.
-    const schoolB = await connect(createInMemoryRepository(), "sch_demo_b");
+    const schoolB = await connect(subject.repo, "sch_demo_b");
     try {
       const data = await callOk<ClassResults>(schoolB, "get_class_results", {
         classId: "sch_demo_b_c2",

@@ -1,22 +1,27 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createInMemoryRepository } from "../src/data/repository.js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { generateDataset } from "../src/data/synthetic.js";
 import { connect } from "./helpers.js";
+import { openPostgresSubject } from "./support/postgres-subject.js";
+import type { ContractSubject } from "./support/repository-contract.js";
 
 interface ClassList {
   school: string;
   classes: { id: string; level: number; studentCount: number }[];
 }
 
-describe("list_classes (through a real MCP client)", () => {
+describe("list_classes (through a real MCP client, over Postgres)", () => {
+  let subject: ContractSubject;
   let client: Client;
 
-  beforeEach(async () => {
-    client = await connect(createInMemoryRepository(), "sch_demo_a");
+  beforeAll(async () => {
+    subject = await openPostgresSubject(generateDataset());
+    client = await connect(subject.repo, "sch_demo_a");
   });
 
-  afterEach(async () => {
-    await client.close();
+  afterAll(async () => {
+    await client?.close();
+    await subject?.close();
   });
 
   it("is advertised as a read-only tool that takes no input", async () => {
@@ -50,7 +55,7 @@ describe("list_classes (through a real MCP client)", () => {
   });
 
   it("gives school B its own classes when the server serves school B", async () => {
-    const schoolB = await connect(createInMemoryRepository(), "sch_demo_b");
+    const schoolB = await connect(subject.repo, "sch_demo_b");
     try {
       const data = (await schoolB.callTool({ name: "list_classes", arguments: {} }))
         .structuredContent as ClassList;
