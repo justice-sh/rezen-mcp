@@ -6,8 +6,9 @@ import { scopeToSchool } from "../src/data/school-repository.js";
 import { createServer } from "../src/server.js";
 
 /**
- * Connect a real MCP client to a real server over an in-memory transport. The server
- * serves one school, the way a token makes it do (ADR-022): `schoolId` says which.
+ * Connect a real MCP client to a real server over an in-memory transport (the
+ * transport is in memory; the data is not). The server serves one school, the way a
+ * token makes it do (ADR-022): `schoolId` says which.
  */
 export async function connect(repo: Repository, schoolId: string): Promise<Client> {
   return connectTo(createServer(scopeToSchool(repo, schoolId)));

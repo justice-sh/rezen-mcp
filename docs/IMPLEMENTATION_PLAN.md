@@ -84,13 +84,14 @@ Rules for slices:
 - [x] Per-school tokens: issue, check and revoke, with only hashes stored (ADR-020)
 - [x] School-scoped repository: one school's view, where another school's IDs look unknown (ADR-021)
 - [x] Server derives the school from the token (ADR-022)
+- [x] Remove the in-memory store: Postgres is the only store, and `DATA_STORE` and `SCHOOL_ID` are gone (ADR-023)
 - [ ] Row-level security policies as a second isolation layer
 - [x] Remove `schoolId` from tool inputs (documented breaking change; ADR-022)
 - [ ] Isolation tests: school A's token against every tool and every school B ID
 
 **Exit criteria:** isolation tests pass for every tool; the app runs against a local or hosted Postgres with no real data; `.env.example` is complete.
 
-**Slices:** (1) Config flow: layered env files, validated schema, `cross-env` for tests. (2) Database connection layer: one `DATABASE_URL`, `DB_PROVIDER` docker or local, `docker-compose.yml`. (3) Dynamic test databases: one per test file, test-mode guard, purge script, CI Postgres. (4) Schema and migrations (Drizzle). (5) Seed and `pre-deploy` script. (6) `PostgresRepository`, contract tests, `DATA_STORE` switch. (7) Per-school tokens. (8) School-scoped repository. (9) Server derives the school from the token; `schoolId` removed from tool inputs. (10) Row-level security. (11) Isolation matrix and phase close.
+**Slices:** (1) Config flow: layered env files, validated schema, `cross-env` for tests. (2) Database connection layer: one `DATABASE_URL`, `DB_PROVIDER` docker or local, `docker-compose.yml`. (3) Dynamic test databases: one per test file, test-mode guard, purge script, CI Postgres. (4) Schema and migrations (Drizzle). (5) Seed and `pre-deploy` script. (6) `PostgresRepository`, contract tests, `DATA_STORE` switch. (7) Per-school tokens. (8) School-scoped repository. (9) Server derives the school from the token; `schoolId` removed from tool inputs. (10) Remove the in-memory store; Postgres only. (11) Row-level security. (12) Isolation matrix and phase close.
 
 **Risks:** leaking existence of other schools' IDs through different error messages. Use one shared not-found error.
 
@@ -139,20 +140,21 @@ Rules for slices:
 
 ## Status log
 
-| Date       | Update                                                                                                                                                                      |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                                                                             |
-| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                                                                        |
-| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client.                                               |
-| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                                                                           |
-| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).                                                            |
-| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).                                                          |
-| 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014).                                      |
-| 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015).            |
-| 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                              |
-| 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                                         |
-| 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                                   |
-| 2026-11-25 | Phase 2 slice 6: `PostgresRepository`, one defined order for every list, `DATA_STORE` switch, shared contract tests on both stores (ADR-019).                               |
-| 2026-11-25 | Phase 2 slice 7: per-school tokens (`src/auth`, `school_tokens`), `pnpm db:token` to issue, list and revoke; only hashes stored; seeding never makes tokens (ADR-020).      |
-| 2026-11-26 | Phase 2 slice 8: school-scoped repository (`scopeToSchool`); another school's IDs look unknown on both stores; not used by the server yet (ADR-021).                        |
-| 2026-11-26 | Phase 2 slice 9: the server serves one school, from `SCHOOL_TOKEN` (Postgres) or `SCHOOL_ID` (memory); tools read through `SchoolRepository`; `schoolId` removed (ADR-022). |
+| Date       | Update                                                                                                                                                                                                                                                                       |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-20 | Phase 0 complete: scaffold, one tool, CI, docs.                                                                                                                                                                                                                              |
+| 2026-11-20 | Phase 1 slice 1: grading domain logic, terms and partial scores in the dataset, extended repository.                                                                                                                                                                         |
+| 2026-11-21 | Phase 1 slice 2: four tools, shared error shape, omitted term means the current term, tools tested through a real MCP client.                                                                                                                                                |
+| 2026-11-21 | Phase 1 complete: grading rules resource and summary prompt added; all five tools match the spec.                                                                                                                                                                            |
+| 2026-11-22 | Tooling: `pnpm inspector` runs the MCP Inspector against the server for manual testing in the browser (ADR-012).                                                                                                                                                             |
+| 2026-11-22 | Phase 2 slice 1: layered, validated configuration (`src/config`); `pnpm test` runs with `NODE_ENV=test` (ADR-013).                                                                                                                                                           |
+| 2026-11-22 | Phase 2 slice 2: database connection layer (`src/db`), `DB_PROVIDER` docker or local, `docker-compose.yml`, `pnpm db:check` (ADR-014).                                                                                                                                       |
+| 2026-11-23 | Phase 2 slice 3: one throwaway test database per test file, test-mode guard, `test:db:setup` (run by `pnpm test`) and `test:db:purge`, Postgres in CI (ADR-015).                                                                                                             |
+| 2026-11-23 | Phase 2 slice 4: Drizzle schema and generated migrations (`src/db/schema.ts`, `drizzle/`), `pnpm db:generate` and `pnpm db:migrate` (ADR-016).                                                                                                                               |
+| 2026-11-25 | Config: `DATABASE_URL` may be a JSON map of provider to URL, resolved by `DB_PROVIDER`; production requires a single URL (ADR-017).                                                                                                                                          |
+| 2026-11-25 | Phase 2 slice 5: idempotent seed (`pnpm db:seed`, `src/db/seed.ts`) and `pnpm pre-deploy` (migrate, then seed) (ADR-018).                                                                                                                                                    |
+| 2026-11-25 | Phase 2 slice 6: `PostgresRepository`, one defined order for every list, `DATA_STORE` switch, shared contract tests on both stores (ADR-019).                                                                                                                                |
+| 2026-11-25 | Phase 2 slice 7: per-school tokens (`src/auth`, `school_tokens`), `pnpm db:token` to issue, list and revoke; only hashes stored; seeding never makes tokens (ADR-020).                                                                                                       |
+| 2026-11-26 | Phase 2 slice 8: school-scoped repository (`scopeToSchool`); another school's IDs look unknown on both stores; not used by the server yet (ADR-021).                                                                                                                         |
+| 2026-11-26 | Phase 2 slice 9: the server serves one school, from `SCHOOL_TOKEN` (Postgres) or `SCHOOL_ID` (memory); tools read through `SchoolRepository`; `schoolId` removed (ADR-022).                                                                                                  |
+| 2026-11-27 | Phase 2 slice 10: the in-memory store, `DATA_STORE` and `SCHOOL_ID` removed; Postgres is the only store and `SCHOOL_TOKEN` is always required; tests read from throwaway Postgres databases (ADR-023). Row-level security is now slice 11 and the isolation matrix slice 12. |

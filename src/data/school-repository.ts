@@ -34,8 +34,7 @@ export interface SchoolRepository {
 }
 
 /**
- * Makes a school's view over any `Repository`, so it works the same for the
- * in-memory and the Postgres store. It does not check that the school exists:
+ * Makes a school's view over a `Repository`. It does not check that the school exists:
  * for an unknown school every school-owned read comes back empty.
  */
 export function scopeToSchool(repo: Repository, schoolId: string): SchoolRepository {

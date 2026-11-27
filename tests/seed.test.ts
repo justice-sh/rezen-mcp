@@ -60,7 +60,7 @@ describe("seedDatabase", () => {
     expect(result.currentTermSet).toBe(true);
   });
 
-  it("stores the same data the in-memory dataset holds, including partial scores", async () => {
+  it("stores the same data the generated dataset holds, including partial scores", async () => {
     // Without partial scores this test would not prove they survive the trip.
     expect(dataset.scores.some((s) => s.ca === null || s.exam === null)).toBe(true);
     await seedDatabase(db);

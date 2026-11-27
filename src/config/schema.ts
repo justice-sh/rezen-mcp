@@ -6,6 +6,19 @@ const databaseUrlSchema = z
   .optional();
 
 /**
+ * Settings that used to exist and were removed (ADR-023). Setting one is an error,
+ * not a silent no-op: a leftover `DATA_STORE=memory` in an env file would look like
+ * it still chose a store, and a leftover `SCHOOL_ID` like it still chose a school.
+ * Only the names are checked, and a message never contains the value.
+ */
+const REMOVED_SETTINGS = {
+  DATA_STORE:
+    "was removed: the server reads Postgres only (ADR-023). Delete it from your env files and environment.",
+  SCHOOL_ID:
+    'was removed: the school comes from SCHOOL_TOKEN (ADR-023). Delete it, and make a token with "pnpm db:token issue <schoolId>".',
+} as const;
+
+/**
  * Every environment variable the app reads is declared here. Add a variable to
  * this schema and it is validated and typed everywhere through `Config`.
  */
@@ -13,8 +26,9 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 
-    // The one connection URL, whichever provider runs the server. Optional until
-    // something needs it (the in-memory repository works without a database).
+    // The one connection URL, whichever provider runs the server. Optional in the
+    // schema so that tooling can load the config without it; whatever opens the
+    // database stops with a hint when it is missing.
     // In the environment it is a postgres URL, or, outside production, a JSON map
     // of provider to URL. The transform below reduces it to the one URL for
     // DB_PROVIDER, so `Config.DATABASE_URL` is always a string (or unset).
@@ -23,58 +37,37 @@ export const envSchema = z
     // Which Postgres runs behind DATABASE_URL: a Docker container or one installed locally.
     DB_PROVIDER: dbProviderSchema.default("docker"),
 
-    // Where the server reads its data from: the in-memory synthetic dataset or Postgres
-    // (which needs DATABASE_URL, a migrated and seeded database; see ADR-019).
-    DATA_STORE: z.enum(["memory", "postgres"]).default("memory"),
-
-    // Who is calling (ADR-022). With DATA_STORE=postgres the server needs a school token
-    // (made by `pnpm db:token issue`) and learns its school from it. The in-memory store
-    // has no tokens, so there SCHOOL_ID picks the school (default: the first demo school).
-    // The checks below reject the combination that would be ignored.
+    // Who is calling (ADR-022). The server needs a school token (made by
+    // `pnpm db:token issue`) and learns its school from it. The server checks it at
+    // startup, so it is optional here: other commands do not need it.
     SCHOOL_TOKEN: z.string().min(1).optional(),
-    SCHOOL_ID: z.string().min(1).optional(),
+
+    // Removed settings (see REMOVED_SETTINGS). Declared only so they can be refused.
+    DATA_STORE: z.string().optional(),
+    SCHOOL_ID: z.string().optional(),
   })
   .transform((env, ctx) => {
-    const dbUrl = getDatabaseUrl(env, ctx);
-    const identityOk = checkIdentity(env, ctx);
-    if (dbUrl === z.NEVER || !identityOk) return z.NEVER;
+    const { DATA_STORE, SCHOOL_ID, ...kept } = env;
+    const removedOk = checkRemoved({ DATA_STORE, SCHOOL_ID }, ctx);
+    const dbUrl = getDatabaseUrl(kept, ctx);
+    if (dbUrl === z.NEVER || !removedOk) return z.NEVER;
 
-    return { ...env, DATABASE_URL: dbUrl };
+    return { ...kept, DATABASE_URL: dbUrl };
   });
 
 export type Config = Readonly<z.infer<typeof envSchema>>;
 
-/**
- * A setting that would be ignored is an error, not a silent no-op: a token that
- * does nothing looks like protection that is not there. Messages never contain the token.
- */
-function checkIdentity(
-  env: {
-    DATA_STORE: "memory" | "postgres";
-    SCHOOL_TOKEN?: string | undefined;
-    SCHOOL_ID?: string | undefined;
-  },
+function checkRemoved(
+  env: Record<keyof typeof REMOVED_SETTINGS, string | undefined>,
   ctx: z.RefinementCtx,
 ): boolean {
-  if (env.DATA_STORE === "memory" && env.SCHOOL_TOKEN !== undefined) {
-    ctx.addIssue({
-      code: "custom",
-      path: ["SCHOOL_TOKEN"],
-      message:
-        "has no effect with DATA_STORE=memory, which has no tokens. Remove it, or use DATA_STORE=postgres.",
-    });
-    return false;
+  let ok = true;
+  for (const name of Object.keys(REMOVED_SETTINGS) as (keyof typeof REMOVED_SETTINGS)[]) {
+    if (env[name] === undefined) continue;
+    ctx.addIssue({ code: "custom", path: [name], message: REMOVED_SETTINGS[name] });
+    ok = false;
   }
-  if (env.DATA_STORE === "postgres" && env.SCHOOL_ID !== undefined) {
-    ctx.addIssue({
-      code: "custom",
-      path: ["SCHOOL_ID"],
-      message:
-        "only applies with DATA_STORE=memory. With postgres the school comes from SCHOOL_TOKEN; remove SCHOOL_ID.",
-    });
-    return false;
-  }
-  return true;
+  return ok;
 }
 
 function getDatabaseUrl(

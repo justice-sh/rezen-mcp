@@ -1,21 +1,26 @@
 import type { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createInMemoryRepository } from "../src/data/repository.js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { generateDataset } from "../src/data/synthetic.js";
 import { gradingRulesText } from "../src/domain/grading.js";
 import { connect } from "./helpers.js";
+import { openPostgresSubject } from "./support/postgres-subject.js";
+import type { ContractSubject } from "./support/repository-contract.js";
 
 function promptText(result: { messages: { content: unknown }[] }): string {
   return (result.messages[0]?.content as { text: string }).text;
 }
 
 describe("resources and prompts", () => {
+  let subject: ContractSubject;
   let client: Client;
 
-  beforeEach(async () => {
-    client = await connect(createInMemoryRepository(), "sch_demo_a");
+  beforeAll(async () => {
+    subject = await openPostgresSubject(generateDataset());
+    client = await connect(subject.repo, "sch_demo_a");
   });
-  afterEach(async () => {
-    await client.close();
+  afterAll(async () => {
+    await client?.close();
+    await subject?.close();
   });
 
   it("advertises the grading rules resource", async () => {
