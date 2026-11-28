@@ -1,5 +1,11 @@
 export type DatabaseErrorKind =
-  "invalid-url" | "unreachable" | "rejected" | "not-migrated" | "no-current-term" | "not-test-mode";
+  | "invalid-url"
+  | "unreachable"
+  | "rejected"
+  | "not-migrated"
+  | "no-current-term"
+  | "not-test-mode"
+  | "no-app-role";
 
 /** A database problem. Messages never contain credentials. */
 export class DatabaseError extends Error {

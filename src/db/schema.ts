@@ -21,7 +21,9 @@ import {
  * Tenancy: `classes`, `students` and `scores` all carry `school_id`, and composite
  * foreign keys force it to agree down the chain (a student's school is its class's
  * school, a score's school is its student's school). Row-level security can then
- * filter on one column of the row itself, with no joins (a later slice).
+ * filter on one column of the row itself, with no joins. The policies are in migration
+ * 0002 (ADR-024), written by hand: drizzle-kit does not know them, so they are not here.
+ * A table added later gets no access for the restricted role until a migration grants it.
  *
  * All data is synthetic. Ids are text because the domain uses string ids.
  */
