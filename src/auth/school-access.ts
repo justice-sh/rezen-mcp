@@ -15,14 +15,16 @@ export interface SchoolAccess {
  * Works out which school this server instance serves, once, at startup (ADR-022).
  *
  * `SCHOOL_TOKEN` is required and is checked against the stored hashes. The school
- * comes from the token, never from anything the caller sends.
+ * comes from the token, never from anything the caller sends. The view is built over
+ * a repository that Postgres itself limits to that school (ADR-024), so there are two
+ * layers: the view, and row-level security under it.
  *
  * Throws a `TokenError` that says what to fix. Messages never contain the token, and
  * a malformed, unknown and revoked token all give the same message (ADR-020).
  */
 export async function openSchoolAccess(
   store: {
-    readonly repository: DataStore["repository"];
+    readonly repositoryFor: DataStore["repositoryFor"];
     readonly tokens: Pick<TokenStore, "verify">;
   },
   config: Pick<Config, "SCHOOL_TOKEN">,
@@ -41,7 +43,7 @@ export async function openSchoolAccess(
     );
   }
 
-  const repository = scopeToSchool(store.repository, verified.schoolId);
+  const repository = scopeToSchool(store.repositoryFor(verified.schoolId), verified.schoolId);
   const school = await repository.getSchool();
   if (school === undefined) {
     throw new TokenError("unknown-school", `There is no school with id "${verified.schoolId}".`);

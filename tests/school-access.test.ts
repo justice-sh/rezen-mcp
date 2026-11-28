@@ -38,13 +38,20 @@ async function errorOf(promise: Promise<unknown>): Promise<TokenError> {
 describe("openSchoolAccess (tokens over Postgres)", () => {
   let db: TestDatabase;
   let tokens: PostgresTokenStore;
-  let store: { repository: PostgresRepository; tokens: PostgresTokenStore };
+  let store: {
+    repositoryFor: (schoolId: string) => PostgresRepository;
+    tokens: PostgresTokenStore;
+  };
   const clients: Client[] = [];
 
   beforeAll(async () => {
     db = await seededDatabase(dataset);
     tokens = new PostgresTokenStore(db);
-    store = { repository: new PostgresRepository(db), tokens };
+    // The way the real store builds it: every school's repository is restricted by Postgres (ADR-024).
+    store = {
+      repositoryFor: (schoolId) => new PostgresRepository(db, { restrictedToSchool: schoolId }),
+      tokens,
+    };
   });
 
   afterEach(async () => {
@@ -144,7 +151,7 @@ describe("openSchoolAccess (tokens over Postgres)", () => {
     // Cannot happen with a real token (it refers to a school by foreign key), so this
     // is the defence in depth, with a store that vouches for a school that is not there.
     const vouching = {
-      repository: store.repository,
+      repositoryFor: store.repositoryFor,
       tokens: { verify: async () => ({ tokenId: "t", schoolId: "sch_nope" }) },
     };
     const error = await errorOf(openSchoolAccess(vouching, { SCHOOL_TOKEN: generateToken() }));

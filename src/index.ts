@@ -9,16 +9,19 @@ async function main() {
   const config = getConfig();
   const store = await openDataStore(config);
 
-  let server;
-  let access;
-  try {
-    // Who is calling is settled once, here, before any tool exists (ADR-022).
-    access = await openSchoolAccess(store, config);
-    server = createServer(access.repository);
-  } catch (error) {
-    await store.close();
-    throw error;
-  }
+  const getServerAndAccess = async () => {
+    try {
+      // Who is calling is settled once, here, before any tool exists (ADR-022).
+      const access = await openSchoolAccess(store, config);
+      const server = createServer(access.repository);
+      return { access, server };
+    } catch (error) {
+      await store.close();
+      throw error;
+    }
+  };
+
+  const { server, access } = await getServerAndAccess();
 
   // Close the database when the client goes away or the process is stopped, or
   // an open Postgres pool would keep the process alive.

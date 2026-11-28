@@ -65,6 +65,8 @@ pnpm db:token revoke <tokenId>                # stop a token from working
 
 The server serves **one school**, decided once when it starts, and no tool takes a school ID (ADR-022). The school is the one `SCHOOL_TOKEN` belongs to: make a token with `pnpm db:token issue`, and set it as `SCHOOL_TOKEN` in `.env` or the environment. The server will not start without a valid token, and a malformed, unknown and revoked token all give the same message. A token is checked when the server starts, so revoking one stops the next start, not a server that is already running.
 
+Isolation has two layers. The server only reads through that school's view, and under it Postgres itself limits every query to the school: the server switches to a read-only role (`rezen_app`) and row-level security shows that role only the school's rows. That role cannot read the token table or write anything (ADR-024). `pnpm db:migrate` creates the role, and the server stops at startup with a message if it is missing.
+
 ### Running the server
 
 Postgres is the only data store (ADR-023). There is no in-memory mode, and `DATA_STORE` and `SCHOOL_ID` no longer exist: setting either one is a configuration error that says to delete it.

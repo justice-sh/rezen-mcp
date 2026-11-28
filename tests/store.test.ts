@@ -26,15 +26,15 @@ describe("openDataStore", () => {
     DB_PROVIDER: getConfig().DB_PROVIDER,
   });
 
-  it("gives a Postgres repository and a token store, and a description without credentials", async () => {
+  it("gives a school-restricted repository and a token store, and a description without credentials", async () => {
     const db = await track(seededDatabase(edgeCaseDataset()));
     const config = postgresConfig(db);
     const store = await openDataStore(config);
     stores.push(store);
 
-    expect(store.repository).toBeInstanceOf(PostgresRepository);
+    expect(store.repositoryFor("sch_a")).toBeInstanceOf(PostgresRepository);
     expect(store.tokens).toBeDefined();
-    expect(await store.repository.getCurrentTerm()).toBe("2026-T2");
+    expect(await store.repositoryFor("sch_a").getCurrentTerm()).toBe("2026-T2");
     expect(store.description).toContain(db.name);
     // A URL would carry the user and password before an "@".
     expect(store.description).not.toContain("@");
@@ -78,6 +78,6 @@ describe("openDataStore", () => {
     const store = await openDataStore(postgresConfig(db));
     await store.close();
     await store.close();
-    await expect(store.repository.listTerms()).rejects.toThrow();
+    await expect(store.repositoryFor("sch_a").listTerms()).rejects.toThrow();
   });
 });
